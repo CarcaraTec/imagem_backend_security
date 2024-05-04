@@ -35,12 +35,23 @@ public class User implements UserDetails {
     private String password;
 
     @Column(name = "ACCESS_TYPE")
+    @Enumerated(EnumType.STRING)
     private UserRole accessType;
 
-    public User(String username, String password, UserRole accessType) {
+    public User(String username, String password, UserRole accessType, String email, String cpf) {
         this.username = username;
         this.password = password;
         this.accessType = accessType;
+        this.email = email;
+        this.cpf = cpf;
+    }
+
+    public User(RegisterDTO data, String encryptedPassword) {
+        this.username = data.login();
+        this.email = data.email();
+        this.cpf = data.cpf();
+        this.accessType = data.role();
+        this.password = encryptedPassword;
     }
 
     @Override
