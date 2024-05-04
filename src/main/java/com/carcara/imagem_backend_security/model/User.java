@@ -1,5 +1,6 @@
 package com.carcara.imagem_backend_security.model;
 
+import com.carcara.imagem_backend_security.enums.UserRole;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -30,11 +31,28 @@ public class User implements UserDetails {
     @Column(name = "CPF")
     private String cpf;
 
-    @Column(name = "ACCESS_TYPE")
-    private String accessType;
-
     @Column(name = "PASSWORD")
     private String password;
+
+    @Column(name = "ACCESS_TYPE")
+    @Enumerated(EnumType.STRING)
+    private UserRole accessType;
+
+    public User(String username, String password, UserRole accessType, String email, String cpf) {
+        this.username = username;
+        this.password = password;
+        this.accessType = accessType;
+        this.email = email;
+        this.cpf = cpf;
+    }
+
+    public User(RegisterDTO data, String encryptedPassword) {
+        this.username = data.login();
+        this.email = data.email();
+        this.cpf = data.cpf();
+        this.accessType = data.role();
+        this.password = encryptedPassword;
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
