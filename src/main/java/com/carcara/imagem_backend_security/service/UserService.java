@@ -1,10 +1,15 @@
 package com.carcara.imagem_backend_security.service;
 
+import com.carcara.imagem_backend_security.enums.StatusRegister;
+import com.carcara.imagem_backend_security.enums.UserRole;
 import com.carcara.imagem_backend_security.exception.ApiException;
+import com.carcara.imagem_backend_security.model.RegisterDTO;
+import com.carcara.imagem_backend_security.model.User;
 import com.carcara.imagem_backend_security.repository.UserRepository;
 import com.carcara.imagem_backend_security.repository.projection.DadosUsuarioProjection;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
@@ -25,4 +30,22 @@ public class UserService {
         return dados;
     }
 
+    public void criarUsuario(RegisterDTO data) {
+        RegisterDTO register = new RegisterDTO(
+                data.login(),
+                data.password(),
+                UserRole.USER,
+                data.email(),
+                data.cpf(),
+                StatusRegister.AGUARDANDO,
+                data.nome(),
+                data.telefone(),
+                data.foto()
+                );
+        String encryptedPassword = new BCryptPasswordEncoder().encode(register.password());
+        User newUser = new User(register, encryptedPassword);
+
+        this.userRepository.save(newUser);
+
+    }
 }
