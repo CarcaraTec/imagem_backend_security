@@ -6,12 +6,15 @@ import com.carcara.imagem_backend_security.exception.ApiException;
 import com.carcara.imagem_backend_security.model.RegisterDTO;
 import com.carcara.imagem_backend_security.model.User;
 import com.carcara.imagem_backend_security.repository.UserRepository;
+import com.carcara.imagem_backend_security.repository.projection.DadosUsuarioAguardandoProjection;
 import com.carcara.imagem_backend_security.repository.projection.DadosUsuarioProjection;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
+
+import java.util.List;
 
 @Service
 public class UserService {
@@ -48,4 +51,15 @@ public class UserService {
         this.userRepository.save(newUser);
 
     }
+
+    public List<DadosUsuarioAguardandoProjection> getUsuarioAguardando() throws ApiException {
+        List<DadosUsuarioAguardandoProjection> status = userRepository.getUsuarioStatusAguardando();
+
+        if (ObjectUtils.isEmpty(status)) {
+            throw new ApiException("Nenhum usuário esperando validação", HttpStatus.NO_CONTENT);
+        }
+
+        return status;
+    }
+
 }
