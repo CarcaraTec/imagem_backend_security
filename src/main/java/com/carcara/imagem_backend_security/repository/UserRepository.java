@@ -3,7 +3,9 @@ package com.carcara.imagem_backend_security.repository;
 import com.carcara.imagem_backend_security.model.User;
 import com.carcara.imagem_backend_security.repository.projection.DadosUsuarioAguardandoProjection;
 import com.carcara.imagem_backend_security.repository.projection.DadosUsuarioProjection;
+import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -31,5 +33,20 @@ public interface UserRepository extends JpaRepository<User, Integer> {
             " FROM users " +
             " WHERE status = 'AGUARDANDO' ", nativeQuery = true)
     List<DadosUsuarioAguardandoProjection> getUsuarioStatusAguardando();
+
+    @Transactional
+    @Modifying
+    @Query(value = " UPDATE users " +
+            " SET status = 'ATIVO' " +
+            " WHERE user_id = :id ", nativeQuery = true)
+    void updateStatusAceito(@Param("id") Integer id);
+
+
+    @Transactional
+    @Modifying
+    @Query(value = " UPDATE users " +
+            " SET status = 'RECUSADO' " +
+            " WHERE user_id = :id ", nativeQuery = true)
+    void updateStatusRecusado(@Param("id") Integer id);
 
 }
