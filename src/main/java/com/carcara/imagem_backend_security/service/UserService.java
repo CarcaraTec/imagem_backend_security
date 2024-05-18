@@ -9,6 +9,7 @@ import com.carcara.imagem_backend_security.repository.UserRepository;
 import com.carcara.imagem_backend_security.repository.projection.DadosUsuarioAguardandoProjection;
 import com.carcara.imagem_backend_security.repository.projection.DadosUsuarioProjection;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -60,6 +61,16 @@ public class UserService {
         }
 
         return status;
+    }
+
+    @Modifying
+    public void updateStatusAceito(Integer id) {
+        userRepository.updateStatusAceito(id);
+    }
+
+    @Modifying
+    public void updateStatusRecusado(Integer id) {
+        userRepository.updateStatusRecusado(id);
     }
 
 }

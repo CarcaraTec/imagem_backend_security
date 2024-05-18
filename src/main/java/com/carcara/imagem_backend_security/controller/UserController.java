@@ -6,10 +6,7 @@ import com.carcara.imagem_backend_security.repository.projection.DadosUsuarioPro
 import com.carcara.imagem_backend_security.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -28,6 +25,18 @@ public class UserController {
     @GetMapping("/usuariosStatusAguardando")
     public ResponseEntity<List<DadosUsuarioAguardandoProjection>> getUsuarioStatusAguardando() throws ApiException {
         return ResponseEntity.ok(service.getUsuarioAguardando());
+    }
+
+    @PutMapping("/updateStatusAceito")
+    public ResponseEntity updateStatusAceito(@RequestParam("id") Integer id) {
+        service.updateStatusAceito(id);
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/updateStatusRecusado")
+    public ResponseEntity updateStatusRecusado(@RequestParam("id") Integer id) {
+        service.updateStatusRecusado(id);
+        return ResponseEntity.ok().build();
     }
 
 }
