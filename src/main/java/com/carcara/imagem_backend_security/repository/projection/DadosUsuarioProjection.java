@@ -5,5 +5,7 @@ public interface DadosUsuarioProjection {
     String getUSername();
     String getEmail();
     String getCpf();
+    String getNome();
+    String getTelefone();
 
 }
