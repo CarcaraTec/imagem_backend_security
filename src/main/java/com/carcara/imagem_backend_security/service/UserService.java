@@ -3,6 +3,7 @@ package com.carcara.imagem_backend_security.service;
 import com.carcara.imagem_backend_security.enums.StatusRegister;
 import com.carcara.imagem_backend_security.enums.UserRole;
 import com.carcara.imagem_backend_security.exception.ApiException;
+import com.carcara.imagem_backend_security.model.DadosAtualizacaoUsuario;
 import com.carcara.imagem_backend_security.model.RegisterDTO;
 import com.carcara.imagem_backend_security.model.User;
 import com.carcara.imagem_backend_security.repository.UserRepository;
@@ -73,4 +74,13 @@ public class UserService {
         userRepository.updateStatusRecusado(id);
     }
 
+    @Modifying
+    public void updateUsuario(DadosAtualizacaoUsuario dadosAtualizacaoUsuario) throws ApiException {
+        var usuario = userRepository.getReferenceById(dadosAtualizacaoUsuario.userId());
+
+        if (ObjectUtils.isEmpty(usuario)) {
+            throw new ApiException("Nenhum usuário encontrado", HttpStatus.NO_CONTENT);
+        }
+        usuario.atualizarInformacoes(dadosAtualizacaoUsuario);
+    }
 }

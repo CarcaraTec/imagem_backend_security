@@ -1,9 +1,12 @@
 package com.carcara.imagem_backend_security.controller;
 
 import com.carcara.imagem_backend_security.exception.ApiException;
+import com.carcara.imagem_backend_security.model.DadosAtualizacaoUsuario;
 import com.carcara.imagem_backend_security.repository.projection.DadosUsuarioAguardandoProjection;
 import com.carcara.imagem_backend_security.repository.projection.DadosUsuarioProjection;
 import com.carcara.imagem_backend_security.service.UserService;
+import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -36,6 +39,13 @@ public class UserController {
     @PutMapping("/updateStatusRecusado")
     public ResponseEntity updateStatusRecusado(@RequestParam("id") Integer id) {
         service.updateStatusRecusado(id);
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/updateUsuario")
+    @Transactional
+    public ResponseEntity updateUsuario(@RequestBody @Valid DadosAtualizacaoUsuario dadosAtualizacaoUsuario) throws ApiException {
+        service.updateUsuario(dadosAtualizacaoUsuario);
         return ResponseEntity.ok().build();
     }
 
