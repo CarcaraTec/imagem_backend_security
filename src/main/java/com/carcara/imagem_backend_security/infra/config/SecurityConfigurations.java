@@ -30,8 +30,12 @@ public class SecurityConfigurations {
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "/auth/register").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/user").hasRole("USER")
-                        .anyRequest().authenticated()//hasRole("ADMIN"))
+                        .requestMatchers(HttpMethod.GET, "/user/dadosPessoaisUsuarios").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/user/usuariosStatusAguardando").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/user/updateStatusAceito").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/user/updateStatusRecusado").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/user/updateUsuario").hasAnyRole("USER", "ADMIN")
+                        .anyRequest().authenticated()
                 )
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
