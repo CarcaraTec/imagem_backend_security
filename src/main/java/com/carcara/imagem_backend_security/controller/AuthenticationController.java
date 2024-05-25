@@ -7,6 +7,7 @@ import com.carcara.imagem_backend_security.model.RegisterDTO;
 import com.carcara.imagem_backend_security.model.User;
 import com.carcara.imagem_backend_security.repository.UserRepository;
 import com.carcara.imagem_backend_security.service.UserService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/auth")
+@Tag(name = "AUTH")
 public class AuthenticationController {
 
     @Autowired
