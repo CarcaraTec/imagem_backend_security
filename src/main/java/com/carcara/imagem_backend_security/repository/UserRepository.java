@@ -52,4 +52,6 @@ public interface UserRepository extends JpaRepository<User, Integer> {
             " WHERE user_id = :id ", nativeQuery = true)
     void updateStatusRecusado(@Param("id") Integer id);
 
+    @Query(value = "SELECT * FROM users WHERE user_id = :id", nativeQuery = true)
+    DadosUsuarioProjection findByIdProject(@Param("id") Integer id);
 }

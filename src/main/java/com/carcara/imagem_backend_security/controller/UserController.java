@@ -45,6 +45,13 @@ public class UserController {
         service.updateStatusRecusado(id);
         return ResponseEntity.ok().build();
     }
+
+    @SecurityRequirement(name = "Bearer Authentication")
+    @GetMapping("/buscar/{id}")
+    public ResponseEntity buscarPorId(@PathVariable("id") Integer id) {
+        return ResponseEntity.ok().body(service.buscarPeloId(id));
+    }
+
     @SecurityRequirement(name = "Bearer Authentication")
     @PutMapping("/updateUsuario")
     @Transactional
