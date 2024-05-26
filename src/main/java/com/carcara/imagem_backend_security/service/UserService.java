@@ -54,13 +54,8 @@ public class UserService {
 
     }
 
-    public List<DadosUsuarioAguardandoProjection> getUsuarioAguardando() throws ApiException {
+    public List<DadosUsuarioAguardandoProjection> getUsuarioAguardando() {
         List<DadosUsuarioAguardandoProjection> status = userRepository.getUsuarioStatusAguardando();
-
-        if (ObjectUtils.isEmpty(status)) {
-            throw new ApiException("Nenhum usuário esperando validação", HttpStatus.NO_CONTENT);
-        }
-
         return status;
     }
 
