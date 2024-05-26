@@ -5,6 +5,7 @@ import com.carcara.imagem_backend_security.model.DadosAtualizacaoUsuario;
 import com.carcara.imagem_backend_security.repository.projection.DadosUsuarioAguardandoProjection;
 import com.carcara.imagem_backend_security.repository.projection.DadosUsuarioProjection;
 import com.carcara.imagem_backend_security.service.UserService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,33 +16,36 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/user")
+@CrossOrigin("*")
 public class UserController {
 
     @Autowired
     UserService service;
 
+    @SecurityRequirement(name = "Bearer Authentication")
     @GetMapping("/dadosPessoaisUsuarios")
     public ResponseEntity<DadosUsuarioProjection> getDadosUsuario(@RequestParam("cpf") String cpf) throws ApiException {
         return ResponseEntity.ok(service.getDadosUsuario(cpf));
     }
 
+    @SecurityRequirement(name = "Bearer Authentication")
     @GetMapping("/usuariosStatusAguardando")
-    public ResponseEntity<List<DadosUsuarioAguardandoProjection>> getUsuarioStatusAguardando() throws ApiException {
+    public ResponseEntity<List<DadosUsuarioAguardandoProjection>> getUsuarioStatusAguardando() {
         return ResponseEntity.ok(service.getUsuarioAguardando());
     }
-
+    @SecurityRequirement(name = "Bearer Authentication")
     @PutMapping("/updateStatusAceito")
     public ResponseEntity updateStatusAceito(@RequestParam("id") Integer id) {
         service.updateStatusAceito(id);
         return ResponseEntity.ok().build();
     }
-
+    @SecurityRequirement(name = "Bearer Authentication")
     @PutMapping("/updateStatusRecusado")
     public ResponseEntity updateStatusRecusado(@RequestParam("id") Integer id) {
         service.updateStatusRecusado(id);
         return ResponseEntity.ok().build();
     }
-
+    @SecurityRequirement(name = "Bearer Authentication")
     @PutMapping("/updateUsuario")
     @Transactional
     public ResponseEntity updateUsuario(@RequestBody @Valid DadosAtualizacaoUsuario dadosAtualizacaoUsuario) throws ApiException {
