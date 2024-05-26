@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class UserService {
@@ -33,6 +34,11 @@ public class UserService {
             throw new ApiException(USUARIO_NAO_ENCONTRADO_NA_BASE, HttpStatus.NO_CONTENT);
 
         return dados;
+    }
+
+    public DadosUsuarioProjection buscarPeloId(Integer id){
+        DadosUsuarioProjection user = userRepository.findByIdProject(id);
+        return user;
     }
 
     public void criarUsuario(RegisterDTO data) {
