@@ -1,5 +1,6 @@
 package com.carcara.imagem_backend_security.model;
 
+import com.carcara.imagem_backend_security.enums.StatusRegister;
 import com.carcara.imagem_backend_security.enums.UserRole;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -36,14 +37,27 @@ public class User implements UserDetails {
     @Column(name = "PASSWORD")
     private String password;
 
-    @Column(name = "ACCESS_TYPE")
+    @Column(name = "ROLE")
     @Enumerated(EnumType.STRING)
-    private UserRole accessType;
+    private UserRole role;
 
-    public User(String username, String password, UserRole accessType, String email, String cpf) {
+    @Column(name = "STATUS")
+    @Enumerated(EnumType.STRING)
+    private StatusRegister status;
+
+    @Column(name = "NOME")
+    private String nome;
+
+    @Column(name = "TELEFONE")
+    private String telefone;
+
+    @Column(name = "FOTO")
+    private String foto;
+
+    public User(String username, String password, UserRole role, String email, String cpf) {
         this.username = username;
         this.password = password;
-        this.accessType = accessType;
+        this.role = role;
         this.email = email;
         this.cpf = cpf;
     }
@@ -52,13 +66,17 @@ public class User implements UserDetails {
         this.username = data.login();
         this.email = data.email();
         this.cpf = data.cpf();
-        this.accessType = data.role();
+        this.role = data.role();
         this.password = encryptedPassword;
+        this.nome = data.nome();
+        this.status = data.status();
+        this.telefone = data.telefone();
+        this.foto = data.foto();
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        if(this.accessType == UserRole.ADMIN) return List.of(new SimpleGrantedAuthority("ROLE_ADMIN"), new SimpleGrantedAuthority("ROLE_USER"));
+        if(this.role == UserRole.ADMIN) return List.of(new SimpleGrantedAuthority("ROLE_ADMIN"), new SimpleGrantedAuthority("ROLE_USER"));
         else return List.of(new SimpleGrantedAuthority("ROLE_USER"));
     }
 
@@ -86,4 +104,26 @@ public class User implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
+
+    public void atualizarInformacoes(DadosAtualizacaoUsuario dados) {
+        if (dados.nome() != null) {
+            this.nome = dados.nome();
+        }
+        if (dados.username() != null) {
+            this.username = dados.username();
+        }
+        if (dados.cpf() != null) {
+            this.cpf = dados.cpf();
+        }
+        if (dados.email() != null) {
+            this.email = dados.email();
+        }
+        if (dados.telefone() != null) {
+            this.telefone = dados.telefone();
+        }
+        if (dados.foto() != null) {
+            this.foto = dados.foto();
+        }
+    }
+
 }

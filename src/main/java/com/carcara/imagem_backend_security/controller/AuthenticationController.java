@@ -6,19 +6,19 @@ import com.carcara.imagem_backend_security.model.LoginResponseDTO;
 import com.carcara.imagem_backend_security.model.RegisterDTO;
 import com.carcara.imagem_backend_security.model.User;
 import com.carcara.imagem_backend_security.repository.UserRepository;
+import com.carcara.imagem_backend_security.service.UserService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/auth")
+@Tag(name = "AUTH")
+@CrossOrigin("*")
 public class AuthenticationController {
 
     @Autowired
@@ -27,26 +27,26 @@ public class AuthenticationController {
     private UserRepository userRepository;
     @Autowired
     private TokenService tokenService;
+    @Autowired
+    private UserService userService;
 
     @PostMapping("/login")
     public ResponseEntity login(@RequestBody @Valid AuthenticationDTO data){
         var usernamePassword = new UsernamePasswordAuthenticationToken(data.login(), data.password());
         var auth = this.authenticationManager.authenticate(usernamePassword);
+        var user = (User) auth.getPrincipal();
 
-        var token = tokenService.generateToken((User) auth.getPrincipal());
-
-        return ResponseEntity.ok(new LoginResponseDTO(token));
+        var token = tokenService.generateToken(user);
+        return ResponseEntity.ok(new LoginResponseDTO(token, user.getUserId(),user.getNome()));
     }
 
     @PostMapping("/register")
     public ResponseEntity register(@RequestBody @Valid RegisterDTO data) {
-        if (this.userRepository.findByUsername(data.login()) != null) return ResponseEntity.badRequest().build();
+        if (this.userRepository.findByUsername(data.login()) != null) {
+            return ResponseEntity.badRequest().build();
+        }
 
-        String encryptedPassword = new BCryptPasswordEncoder().encode(data.password());
-        User newUser = new User(data, encryptedPassword);
-
-        this.userRepository.save(newUser);
-
+        userService.criarUsuario(data);
         return ResponseEntity.ok().build();
     }
 
