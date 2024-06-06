@@ -1,5 +1,6 @@
 package com.carcara.imagem_backend_security.controller;
 
+import com.carcara.imagem_backend_security.exception.ApiException;
 import com.carcara.imagem_backend_security.infra.config.TokenService;
 import com.carcara.imagem_backend_security.model.AuthenticationDTO;
 import com.carcara.imagem_backend_security.model.LoginResponseDTO;
@@ -31,7 +32,9 @@ public class AuthenticationController {
     private UserService userService;
 
     @PostMapping("/login")
-    public ResponseEntity login(@RequestBody @Valid AuthenticationDTO data){
+    public ResponseEntity login(@RequestBody @Valid AuthenticationDTO data) throws ApiException {
+        userService.getRole(data.login());
+
         var usernamePassword = new UsernamePasswordAuthenticationToken(data.login(), data.password());
         var auth = this.authenticationManager.authenticate(usernamePassword);
         var user = (User) auth.getPrincipal();
