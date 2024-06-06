@@ -1,7 +1,6 @@
 package com.carcara.imagem_backend_security.service;
 
 import com.carcara.imagem_backend_security.enums.StatusRegister;
-import com.carcara.imagem_backend_security.enums.UserRole;
 import com.carcara.imagem_backend_security.exception.ApiException;
 import com.carcara.imagem_backend_security.model.DadosAtualizacaoUsuario;
 import com.carcara.imagem_backend_security.model.RegisterDTO;
@@ -12,12 +11,12 @@ import com.carcara.imagem_backend_security.repository.projection.DadosUsuarioPro
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class UserService {
@@ -45,7 +44,7 @@ public class UserService {
         RegisterDTO register = new RegisterDTO(
                 data.login(),
                 data.password(),
-                UserRole.USER,
+                null,
                 data.email(),
                 data.cpf(),
                 StatusRegister.AGUARDANDO,
@@ -83,5 +82,17 @@ public class UserService {
             throw new ApiException("Nenhum usuário encontrado", HttpStatus.NO_CONTENT);
         }
         usuario.atualizarInformacoes(dadosAtualizacaoUsuario);
+    }
+
+    public String getRole(String login) throws ApiException {
+        UserDetails usuario = userRepository.findByUsername(login);
+        String role = userRepository.getRole(login);
+
+        if (ObjectUtils.isEmpty(usuario))
+            throw new ApiException("Usuário não encontrado", HttpStatus.NO_CONTENT);
+        if (ObjectUtils.isEmpty(role))
+            throw new ApiException("Usuário ainda não autorizado", HttpStatus.NO_CONTENT);
+
+        return role;
     }
 }

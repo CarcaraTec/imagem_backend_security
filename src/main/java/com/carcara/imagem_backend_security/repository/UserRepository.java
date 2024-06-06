@@ -40,10 +40,10 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     @Transactional
     @Modifying
     @Query(value = " UPDATE users " +
-            " SET status = 'ATIVO' " +
+            " SET status = 'ATIVO', " +
+            " role = 'USER' " +
             " WHERE user_id = :id ", nativeQuery = true)
     void updateStatusAceito(@Param("id") Integer id);
-
 
     @Transactional
     @Modifying
@@ -54,4 +54,7 @@ public interface UserRepository extends JpaRepository<User, Integer> {
 
     @Query(value = "SELECT * FROM users WHERE user_id = :id", nativeQuery = true)
     DadosUsuarioProjection findByIdProject(@Param("id") Integer id);
+
+    @Query(value = " SELECT ROLE FROM USERS WHERE USERNAME = :login ", nativeQuery = true)
+    String getRole(String login);
 }
