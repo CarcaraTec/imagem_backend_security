@@ -6,8 +6,6 @@ public record DadosAtualizacaoUsuario(
 
         @NotNull
         Integer userId,
-        String username,
-        String email,
         String cpf,
         String nome,
         String telefone,

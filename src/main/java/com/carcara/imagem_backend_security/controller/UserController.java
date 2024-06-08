@@ -60,4 +60,11 @@ public class UserController {
         return ResponseEntity.ok().build();
     }
 
+    @GetMapping("/listar")
+    @SecurityRequirement(name = "Bearer Authentication")
+    public ResponseEntity listarUsuarios(){
+        List<DadosUsuarioProjection> users = service.listarUsuarios();
+        return ResponseEntity.ok().body(users);
+    }
+
 }
