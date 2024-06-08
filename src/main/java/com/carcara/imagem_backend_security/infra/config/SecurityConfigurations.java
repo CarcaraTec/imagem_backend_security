@@ -45,6 +45,7 @@ public class SecurityConfigurations {
                     authorize
                             .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
                             .requestMatchers(HttpMethod.POST, "/auth/register").permitAll()
+                            .requestMatchers(HttpMethod.POST, "/termo/acidionaTermo").hasRole("ADMIN")
                             .requestMatchers(HttpMethod.GET, "/user/dadosPessoaisUsuarios").hasAnyRole("USER", "ADMIN")
                             .requestMatchers(HttpMethod.GET, "/user/usuariosStatusAguardando").hasRole("ADMIN")
                             .requestMatchers(HttpMethod.PUT, "/user/updateStatusAceito").hasRole("ADMIN")
