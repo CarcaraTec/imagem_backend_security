@@ -66,10 +66,10 @@ public class User implements UserDetails {
         this.username = data.login();
         this.email = data.email();
         this.cpf = data.cpf();
-        this.role = data.role();
+        this.role = null;
         this.password = encryptedPassword;
         this.nome = data.nome();
-        this.status = data.status();
+        this.status = StatusRegister.AGUARDANDO;
         this.telefone = data.telefone();
         this.foto = data.foto();
     }

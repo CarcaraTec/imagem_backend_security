@@ -44,10 +44,8 @@ public class UserService {
         RegisterDTO register = new RegisterDTO(
                 data.login(),
                 data.password(),
-                null,
                 data.email(),
                 data.cpf(),
-                StatusRegister.AGUARDANDO,
                 data.nome(),
                 data.telefone(),
                 data.foto()
