@@ -111,14 +111,8 @@ public class User implements UserDetails {
         if (dados.nome() != null) {
             this.nome = dados.nome();
         }
-        if (dados.username() != null) {
-            this.username = dados.username();
-        }
         if (dados.cpf() != null) {
             this.cpf = dados.cpf();
-        }
-        if (dados.email() != null) {
-            this.email = dados.email();
         }
         if (dados.telefone() != null) {
             this.telefone = dados.telefone();

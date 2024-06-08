@@ -95,4 +95,8 @@ public class UserService {
 
         return role;
     }
+
+    public List<DadosUsuarioProjection> listarUsuarios() {
+        return userRepository.findAllUsers();
+    }
 }

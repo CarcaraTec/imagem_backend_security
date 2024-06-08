@@ -19,6 +19,7 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     UserDetails findByUsername(String username);
 
     @Query(value = " SELECT " +
+            "user_id, " +
             " username AS username, " +
             " email AS email, " +
             " cpf AS cpf, " +
@@ -57,4 +58,15 @@ public interface UserRepository extends JpaRepository<User, Integer> {
 
     @Query(value = " SELECT ROLE FROM USERS WHERE USERNAME = :login ", nativeQuery = true)
     String getRole(String login);
+
+    @Query(value = " SELECT " +
+            "user_id, " +
+            " username AS username, " +
+            " email AS email, " +
+            " cpf AS cpf, " +
+            " nome AS nome, " +
+            " telefone AS telefone " +
+            " FROM users " +
+            " WHERE status != 'RECUSADO' ", nativeQuery = true)
+    List<DadosUsuarioProjection> findAllUsers();
 }
