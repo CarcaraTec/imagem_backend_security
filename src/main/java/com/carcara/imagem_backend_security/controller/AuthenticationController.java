@@ -44,7 +44,7 @@ public class AuthenticationController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity register(@RequestBody @Valid RegisterDTO data) {
+    public ResponseEntity register(@RequestBody @Valid RegisterDTO data) throws Exception {
         if (this.userRepository.findByUsername(data.login()) != null) {
             return ResponseEntity.badRequest().build();
         }

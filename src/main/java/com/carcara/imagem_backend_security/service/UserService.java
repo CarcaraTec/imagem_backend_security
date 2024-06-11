@@ -1,13 +1,16 @@
 package com.carcara.imagem_backend_security.service;
 
-import com.carcara.imagem_backend_security.enums.StatusRegister;
 import com.carcara.imagem_backend_security.exception.ApiException;
 import com.carcara.imagem_backend_security.model.DadosAtualizacaoUsuario;
 import com.carcara.imagem_backend_security.model.RegisterDTO;
 import com.carcara.imagem_backend_security.model.User;
 import com.carcara.imagem_backend_security.repository.UserRepository;
+import com.carcara.imagem_backend_security.repository.key.ChavesAcessoRepository;
 import com.carcara.imagem_backend_security.repository.projection.DadosUsuarioAguardandoProjection;
 import com.carcara.imagem_backend_security.repository.projection.DadosUsuarioProjection;
+import com.carcara.imagem_backend_security.util.EncryptionUtil;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.http.HttpStatus;
@@ -16,6 +19,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
+import javax.crypto.SecretKey;
 import java.util.List;
 
 @Service
@@ -23,8 +27,14 @@ public class UserService {
 
     public static final String USUARIO_NAO_ENCONTRADO_NA_BASE = "Usuário não encontrado na base";
 
+    private final UserRepository userRepository;
+    private final ChavesAcessoRepository chavesAcessoRepository;
+
     @Autowired
-    UserRepository userRepository;
+    public UserService(UserRepository userRepository, ChavesAcessoRepository chavesAcessoRepository) {
+        this.userRepository = userRepository;
+        this.chavesAcessoRepository = chavesAcessoRepository;
+    }
 
     public DadosUsuarioProjection getDadosUsuario(String cpf) throws ApiException {
         DadosUsuarioProjection dados = userRepository.getDadosUsuario(cpf);
@@ -40,7 +50,8 @@ public class UserService {
         return user;
     }
 
-    public void criarUsuario(RegisterDTO data) {
+    @Transactional
+    public void criarUsuario(RegisterDTO data) throws Exception {
         RegisterDTO register = new RegisterDTO(
                 data.login(),
                 data.password(),
@@ -53,8 +64,25 @@ public class UserService {
         String encryptedPassword = new BCryptPasswordEncoder().encode(register.password());
         User newUser = new User(register, encryptedPassword);
 
-        this.userRepository.save(newUser);
+        User savedUser = this.userRepository.save(newUser);
 
+        encryptedUser(savedUser);
+
+    }
+
+    @Transactional
+    public void encryptedUser(User savedUser) throws Exception {
+        SecretKey secretKey = EncryptionUtil.generateKey();
+        ObjectMapper objectMapper = new ObjectMapper();
+        String jsonString = objectMapper.writeValueAsString(savedUser);
+        String encryptedString = EncryptionUtil.encrypt(jsonString, secretKey);
+
+        salvarUsuario(savedUser.getUserId(), encryptedString);
+    }
+
+    @Transactional
+    public void salvarUsuario(Integer userId, String encryptedString) {
+        chavesAcessoRepository.salvarEncrypted(userId, encryptedString);
     }
 
     public List<DadosUsuarioAguardandoProjection> getUsuarioAguardando() {
