@@ -1,5 +1,6 @@
 package com.carcara.imagem_backend_security.controller;
 
+import com.carcara.imagem_backend_security.enums.StatusRegister;
 import com.carcara.imagem_backend_security.exception.ApiException;
 import com.carcara.imagem_backend_security.infra.config.TokenService;
 import com.carcara.imagem_backend_security.model.AuthenticationDTO;
@@ -11,6 +12,7 @@ import com.carcara.imagem_backend_security.service.UserService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -33,11 +35,16 @@ public class AuthenticationController {
 
     @PostMapping("/login")
     public ResponseEntity login(@RequestBody @Valid AuthenticationDTO data) throws ApiException {
+
         userService.getRole(data.login());
 
         var usernamePassword = new UsernamePasswordAuthenticationToken(data.login(), data.password());
         var auth = this.authenticationManager.authenticate(usernamePassword);
         var user = (User) auth.getPrincipal();
+
+        if (user.getStatus() != StatusRegister.ATIVO){
+            throw new ApiException("Usuario não aprovado", HttpStatus.FORBIDDEN);
+        }
 
         var token = tokenService.generateToken(user);
         return ResponseEntity.ok(new LoginResponseDTO(token, user.getUserId(),user.getNome()));
