@@ -60,7 +60,7 @@ public interface UserRepository extends JpaRepository<User, Integer> {
             "status AS status " +
             " FROM users " +
             " WHERE status != 'RECUSADO' " +
-            "AND status = :status " +
+            "AND (:status is null or status = :status) " +
             "AND user_id != :id", nativeQuery = true)
     List<DadosUsuarioProjection> findAllUsers(@Param("status")String status, @Param("id") Integer id);
 }
