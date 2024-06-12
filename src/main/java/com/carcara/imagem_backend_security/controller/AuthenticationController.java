@@ -47,7 +47,7 @@ public class AuthenticationController {
         }
 
         var token = tokenService.generateToken(user);
-        return ResponseEntity.ok(new LoginResponseDTO(token, user.getUserId(),user.getNome()));
+        return ResponseEntity.ok(new LoginResponseDTO(token.token(), user.getUserId(),user.getNome(), token.expiration()));
     }
 
     @PostMapping("/register")

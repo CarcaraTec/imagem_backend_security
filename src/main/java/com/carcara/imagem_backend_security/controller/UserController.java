@@ -1,8 +1,8 @@
 package com.carcara.imagem_backend_security.controller;
 
+import com.carcara.imagem_backend_security.enums.StatusRegister;
 import com.carcara.imagem_backend_security.exception.ApiException;
 import com.carcara.imagem_backend_security.model.DadosAtualizacaoUsuario;
-import com.carcara.imagem_backend_security.repository.projection.DadosUsuarioAguardandoProjection;
 import com.carcara.imagem_backend_security.repository.projection.DadosUsuarioProjection;
 import com.carcara.imagem_backend_security.service.UserService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -28,11 +28,6 @@ public class UserController {
         return ResponseEntity.ok(service.getDadosUsuario(cpf));
     }
 
-    @SecurityRequirement(name = "Bearer Authentication")
-    @GetMapping("/usuariosStatusAguardando")
-    public ResponseEntity<List<DadosUsuarioAguardandoProjection>> getUsuarioStatusAguardando() {
-        return ResponseEntity.ok(service.getUsuarioAguardando());
-    }
     @SecurityRequirement(name = "Bearer Authentication")
     @PutMapping("/updateStatusAceito")
     public ResponseEntity updateStatusAceito(@RequestParam("id") Integer id) {
@@ -62,8 +57,8 @@ public class UserController {
 
     @GetMapping("/listar")
     @SecurityRequirement(name = "Bearer Authentication")
-    public ResponseEntity listarUsuarios(){
-        List<DadosUsuarioProjection> users = service.listarUsuarios();
+    public ResponseEntity listarUsuarios(@RequestParam StatusRegister status){
+        List<DadosUsuarioProjection> users = service.listarUsuarios(status);
         return ResponseEntity.ok().body(users);
     }
 
