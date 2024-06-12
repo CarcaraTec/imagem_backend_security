@@ -122,6 +122,6 @@ public class UserService {
 
     public List<DadosUsuarioProjection> listarUsuarios(StatusRegister status) {
         User user = usuarioLogado.resgatarUsuario();
-        return userRepository.findAllUsers(status.getStatus().toUpperCase(), user.getUserId());
+        return userRepository.findAllUsers(status != null ? status.getStatus().toUpperCase() : null, user.getUserId());
     }
 }

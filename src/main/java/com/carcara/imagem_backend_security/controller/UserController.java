@@ -57,7 +57,7 @@ public class UserController {
 
     @GetMapping("/listar")
     @SecurityRequirement(name = "Bearer Authentication")
-    public ResponseEntity listarUsuarios(@RequestParam StatusRegister status){
+    public ResponseEntity listarUsuarios(@RequestParam(required = false) StatusRegister status){
         List<DadosUsuarioProjection> users = service.listarUsuarios(status);
         return ResponseEntity.ok().body(users);
     }
