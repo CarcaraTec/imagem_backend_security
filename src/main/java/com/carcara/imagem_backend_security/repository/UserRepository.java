@@ -1,7 +1,7 @@
 package com.carcara.imagem_backend_security.repository;
 
+import com.carcara.imagem_backend_security.enums.StatusRegister;
 import com.carcara.imagem_backend_security.model.User;
-import com.carcara.imagem_backend_security.repository.projection.DadosUsuarioAguardandoProjection;
 import com.carcara.imagem_backend_security.repository.projection.DadosUsuarioProjection;
 import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -28,15 +28,6 @@ public interface UserRepository extends JpaRepository<User, Integer> {
             " FROM users " +
             " WHERE cpf = :cpf ", nativeQuery = true)
     DadosUsuarioProjection getDadosUsuario(@Param("cpf") String cpf);
-
-    @Query(value = " SELECT " +
-            " user_id AS userId, " +
-            " nome AS nome, " +
-            " telefone AS telefone, " +
-            " email AS email" +
-            " FROM users " +
-            " WHERE status = 'AGUARDANDO' ", nativeQuery = true)
-    List<DadosUsuarioAguardandoProjection> getUsuarioStatusAguardando();
 
     @Transactional
     @Modifying
@@ -65,8 +56,11 @@ public interface UserRepository extends JpaRepository<User, Integer> {
             " email AS email, " +
             " cpf AS cpf, " +
             " nome AS nome, " +
-            " telefone AS telefone " +
+            " telefone AS telefone, " +
+            "status AS status " +
             " FROM users " +
-            " WHERE status != 'RECUSADO' ", nativeQuery = true)
-    List<DadosUsuarioProjection> findAllUsers();
+            " WHERE status != 'RECUSADO' " +
+            "AND status = :status " +
+            "AND user_id != :id", nativeQuery = true)
+    List<DadosUsuarioProjection> findAllUsers(@Param("status")String status, @Param("id") Integer id);
 }

@@ -1,14 +1,15 @@
 package com.carcara.imagem_backend_security.service;
 
+import com.carcara.imagem_backend_security.enums.StatusRegister;
 import com.carcara.imagem_backend_security.exception.ApiException;
 import com.carcara.imagem_backend_security.model.DadosAtualizacaoUsuario;
 import com.carcara.imagem_backend_security.model.RegisterDTO;
 import com.carcara.imagem_backend_security.model.User;
 import com.carcara.imagem_backend_security.repository.UserRepository;
 import com.carcara.imagem_backend_security.repository.key.ChavesAcessoRepository;
-import com.carcara.imagem_backend_security.repository.projection.DadosUsuarioAguardandoProjection;
 import com.carcara.imagem_backend_security.repository.projection.DadosUsuarioProjection;
 import com.carcara.imagem_backend_security.util.EncryptionUtil;
+import com.carcara.imagem_backend_security.util.UsuarioLogado;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +28,8 @@ public class UserService {
 
     public static final String USUARIO_NAO_ENCONTRADO_NA_BASE = "Usuário não encontrado na base";
 
+    @Autowired
+    private UsuarioLogado usuarioLogado;
     private final UserRepository userRepository;
     private final ChavesAcessoRepository chavesAcessoRepository;
 
@@ -85,11 +88,6 @@ public class UserService {
         chavesAcessoRepository.salvarEncrypted(userId, encryptedString);
     }
 
-    public List<DadosUsuarioAguardandoProjection> getUsuarioAguardando() {
-        List<DadosUsuarioAguardandoProjection> status = userRepository.getUsuarioStatusAguardando();
-        return status;
-    }
-
     @Modifying
     public void updateStatusAceito(Integer id) {
         userRepository.updateStatusAceito(id);
@@ -122,7 +120,8 @@ public class UserService {
         return role;
     }
 
-    public List<DadosUsuarioProjection> listarUsuarios() {
-        return userRepository.findAllUsers();
+    public List<DadosUsuarioProjection> listarUsuarios(StatusRegister status) {
+        User user = usuarioLogado.resgatarUsuario();
+        return userRepository.findAllUsers(status.getStatus().toUpperCase(), user.getUserId());
     }
 }
