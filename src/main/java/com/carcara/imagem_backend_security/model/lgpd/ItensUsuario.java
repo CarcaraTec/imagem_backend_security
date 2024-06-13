@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Table(name = "ITEM_USUARIO")
+@Table(name = "ITENS_USUARIO")
 @Entity(name = "itensUsuario")
 @AllArgsConstructor
 @NoArgsConstructor
@@ -22,7 +22,7 @@ public class ItensUsuario {
     @Column(name = "ID_ITEM")
     private Integer idItem;
 
-    @Column(name = "ID_USUARIO")
+    @Column(name = "USER_ID")
     private Integer idUsuario;
 
 }
