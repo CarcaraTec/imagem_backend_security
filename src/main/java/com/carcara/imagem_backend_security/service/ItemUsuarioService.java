@@ -14,20 +14,18 @@ import java.util.List;
 public class ItemUsuarioService {
 
     private final ItemUsuarioRepository repository;
-    private final UsuarioLogado usuarioLogado;
     @Autowired
     public ItemUsuarioService(ItemUsuarioRepository repository,
                               UsuarioLogado usuarioLogado) {
         this.repository = repository;
-        this.usuarioLogado = usuarioLogado;
     }
 
     @Transactional
     @Modifying
-    public void adicionaItensUsuario(List<Integer> id) {
+    public void adicionaItensUsuario(List<Integer> id, Integer userId) {
         for (Integer idItem : id) {
             ItensUsuario itensUsuario = new ItensUsuario();
-            itensUsuario.setIdUsuario(usuarioLogado.resgatarUsuario().getUserId());
+            itensUsuario.setIdUsuario(userId);
             itensUsuario.setIdItem(idItem);
 
             repository.save(itensUsuario);

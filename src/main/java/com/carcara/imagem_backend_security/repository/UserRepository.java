@@ -24,7 +24,8 @@ public interface UserRepository extends JpaRepository<User, Integer> {
             " email AS email, " +
             " cpf AS cpf, " +
             " nome AS nome, " +
-            " telefone AS telefone " +
+            " telefone AS telefone," +
+            "status AS status " +
             " FROM users " +
             " WHERE cpf = :cpf ", nativeQuery = true)
     DadosUsuarioProjection getDadosUsuario(@Param("cpf") String cpf);

@@ -1,6 +1,7 @@
 package com.carcara.imagem_backend_security.service;
 
 import com.carcara.imagem_backend_security.exception.ApiException;
+import com.carcara.imagem_backend_security.exception.ValidacaoException;
 import com.carcara.imagem_backend_security.model.lgpd.CriarTermoDTO;
 import com.carcara.imagem_backend_security.model.User;
 import com.carcara.imagem_backend_security.model.lgpd.RetornarTermo;
@@ -68,13 +69,15 @@ public class TermoService {
 
     public RetornarTermo exibirTermo(){
         ExibicaoTermoProjection termo = repository.buscarUltimoTermo();
+        if (ObjectUtils.isEmpty(termo)){
+            throw new ValidacaoException("Termo não existe", HttpStatus.BAD_REQUEST);
+        }
         List<ExibicaoItemProjection> itens = repository.buscarItensTermo(termo.getIdTermo());
         return new RetornarTermo(termo, itens);
 
     }
 
     public Integer buscarUltimaVersao(){
-
         Integer valor = repository.buscarUltimaVersao();
         return valor != null ? valor : 0;
     }
