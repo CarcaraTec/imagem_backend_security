@@ -1,15 +1,13 @@
 package com.carcara.imagem_backend_security.model.lgpd;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Table(name = "TERMO")
 @Entity(name = "termo")
@@ -21,6 +19,7 @@ public class Termo {
 
     @Id
     @Column(name = "ID_TERMO")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer idTermo;
 
     @Column(name = "NM_VERSAO")
@@ -33,6 +32,6 @@ public class Termo {
     private String dsCriador;
 
     @Column(name = "DH_CRIACAO")
-    private LocalDate dhCriacao;
+    private LocalDateTime dhCriacao;
 
 }

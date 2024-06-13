@@ -3,6 +3,7 @@ package com.carcara.imagem_backend_security.controller;
 import com.carcara.imagem_backend_security.enums.StatusRegister;
 import com.carcara.imagem_backend_security.exception.ApiException;
 import com.carcara.imagem_backend_security.model.DadosAtualizacaoUsuario;
+import com.carcara.imagem_backend_security.model.lgpd.Termo;
 import com.carcara.imagem_backend_security.repository.projection.DadosUsuarioProjection;
 import com.carcara.imagem_backend_security.service.UserService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -61,5 +62,6 @@ public class UserController {
         List<DadosUsuarioProjection> users = service.listarUsuarios(status);
         return ResponseEntity.ok().body(users);
     }
+
 
 }
