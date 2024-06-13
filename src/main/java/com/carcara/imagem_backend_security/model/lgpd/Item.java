@@ -1,9 +1,6 @@
 package com.carcara.imagem_backend_security.model.lgpd;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,6 +16,7 @@ public class Item {
 
     @Id
     @Column(name = "ID_ITEM")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer idItem;
 
     @Column(name = "ID_TERMO")

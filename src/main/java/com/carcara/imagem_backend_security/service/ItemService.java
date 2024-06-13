@@ -1,6 +1,7 @@
 package com.carcara.imagem_backend_security.service;
 
 import com.carcara.imagem_backend_security.exception.ApiException;
+import com.carcara.imagem_backend_security.model.lgpd.CriarItemDTO;
 import com.carcara.imagem_backend_security.model.lgpd.Item;
 import com.carcara.imagem_backend_security.repository.ItemRepository;
 import jakarta.transaction.Transactional;
@@ -24,17 +25,16 @@ public class ItemService {
     }
 
     @Transactional
-    public void adicionaItens(List<Item> itens, Integer numeroVersaoTermo) throws ApiException {
+    public void adicionaItens(List<CriarItemDTO> itens, Integer numeroVersaoTermo) throws ApiException {
         if (ObjectUtils.isEmpty(itens)) {
             throw new ApiException(TERMO_NAO_PODE_SER_CRIADO_SEM_ITEM, HttpStatus.NON_AUTHORITATIVE_INFORMATION);
         }
 
-        for(Item item : itens) {
+        for(CriarItemDTO item : itens) {
             Item adicionaItem = new Item();
             adicionaItem.setIdTermo(numeroVersaoTermo);
-            adicionaItem.setIdItem(item.getIdItem());
-            adicionaItem.setDsItem(item.getDsItem());
-            adicionaItem.setSnMandatorio(item.getSnMandatorio());
+            adicionaItem.setDsItem(item.descricao());
+            adicionaItem.setSnMandatorio(item.mandatorio());
 
             repository.save(adicionaItem);
         }
