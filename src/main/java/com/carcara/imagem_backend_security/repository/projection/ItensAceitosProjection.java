@@ -1,8 +1,7 @@
 package com.carcara.imagem_backend_security.repository.projection;
 
-public interface ExibicaoItemProjection {
+public interface ItensAceitosProjection {
 
     Integer getIdItem();
-    String getDescricao();
     String getMandatorio();
 }

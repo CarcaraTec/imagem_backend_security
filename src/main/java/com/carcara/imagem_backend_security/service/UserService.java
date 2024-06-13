@@ -39,8 +39,9 @@ public class UserService {
         this.chavesAcessoRepository = chavesAcessoRepository;
     }
 
-    public DadosUsuarioProjection getDadosUsuario(String cpf) throws ApiException {
-        DadosUsuarioProjection dados = userRepository.getDadosUsuario(cpf);
+    public DadosUsuarioProjection getDadosUsuario() throws ApiException {
+        User userLogado = usuarioLogado.resgatarUsuario();
+        DadosUsuarioProjection dados = userRepository.getDadosUsuario(userLogado.getCpf());
 
         if (ObjectUtils.isEmpty(dados))
             throw new ApiException(USUARIO_NAO_ENCONTRADO_NA_BASE, HttpStatus.NO_CONTENT);
