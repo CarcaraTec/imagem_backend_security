@@ -4,4 +4,5 @@ public interface ExibicaoTermoProjection {
 
     Integer getIdTermo();
     String getDescricao();
+    Integer getVersao();
 }

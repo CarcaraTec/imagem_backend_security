@@ -18,5 +18,15 @@ public interface ItemUsuarioRepository extends JpaRepository<ItensUsuario, Integ
             "ON i.id_termo = t.id_termo " +
             "where iu.user_id = :userId " +
             "and t.id_termo = :termoId" , nativeQuery = true)
-    List<ItensAceitosProjection> itensAceitosPeloUsuario(@Param("userId") Integer userId, @Param("termoId") Integer termoId);
+    List<ItensAceitosProjection> itensAceitosPeloUsuarioProjection(@Param("userId") Integer userId, @Param("termoId") Integer termoId);
+
+    @Query(value ="select iu.id_item_usuario,iu.user_id , i.* " +
+            "from itens_usuario iu " +
+            "JOIN item i " +
+            "ON iu.id_item = i.id_item " +
+            "JOIN termo t " +
+            "ON i.id_termo = t.id_termo " +
+            "where iu.user_id = :userId " +
+            "and t.id_termo = :termoId" , nativeQuery = true)
+    List<ItensUsuario> itensAceitosPeloUsuarioEntidade(@Param("userId") Integer userId, @Param("termoId") Integer termoId);
 }

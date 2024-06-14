@@ -42,7 +42,7 @@ public class ValidadorTermoAceito implements ValidadorLogin{
 
         RetornarTermo versaoAtual = termoService.exibirTermo();
         List<ItensAceitosProjection> itensAceitos =
-                itemUsuarioRepository.itensAceitosPeloUsuario(user.getUserId(), versaoAtual.termo.getIdTermo());
+                itemUsuarioRepository.itensAceitosPeloUsuarioProjection(user.getUserId(), versaoAtual.termo.getIdTermo());
 
         if (itensAceitos.isEmpty()) {
             user.setRole(UserRole.ACEITETERMO);

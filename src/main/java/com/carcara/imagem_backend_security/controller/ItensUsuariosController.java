@@ -1,5 +1,8 @@
 package com.carcara.imagem_backend_security.controller;
 
+import com.carcara.imagem_backend_security.model.Log;
+import com.carcara.imagem_backend_security.model.lgpd.ItensUsuario;
+import com.carcara.imagem_backend_security.repository.projection.ItensAceitosProjection;
 import com.carcara.imagem_backend_security.service.ItemUsuarioService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -23,9 +26,32 @@ public class ItensUsuariosController {
 
     @PostMapping("/aceitar")
     @Operation(summary = "Aceitar termo")
-    public ResponseEntity adicionaItensUsuario(@RequestParam Integer userId, @RequestBody List<Integer> idTermo) {
-        service.adicionaItensUsuario(idTermo, userId);
+    @SecurityRequirement(name = "Bearer Authentication")
+    public ResponseEntity adicionaItensUsuario(@RequestBody List<Integer> id) {
+        service.adicionaItensUsuario(id);
         return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/atualizar-itens")
+    @Operation(summary = "Atualizar itens aceitos")
+    @SecurityRequirement(name = "Bearer Authentication")
+    public ResponseEntity atualizaItensUsuario(@RequestBody List<Integer> id) {
+        service.atualizarItensUsuario(id);
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/itens-aceitos")
+    @Operation(summary = "Buscar itens aceitos")
+    @SecurityRequirement(name = "Bearer Authentication")
+    public ResponseEntity<List<ItensAceitosProjection>> buscaItensUsuario() {
+        return ResponseEntity.ok().body(service.buscarItensAceitos());
+    }
+
+    @GetMapping("/logs")
+    @Operation(summary = "Verificar logs")
+    @SecurityRequirement(name = "Bearer Authentication")
+    public ResponseEntity<List<Log>> logs() {
+        return ResponseEntity.ok().body(service.logs());
     }
 
 }
