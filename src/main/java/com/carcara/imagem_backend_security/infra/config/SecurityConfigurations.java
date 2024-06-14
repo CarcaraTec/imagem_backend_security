@@ -53,8 +53,8 @@ public class SecurityConfigurations {
                             .requestMatchers(HttpMethod.PUT, "/user/updateStatusAceito").hasRole("ADMIN")
                             .requestMatchers(HttpMethod.PUT, "/user/updateStatusRecusado").hasRole("ADMIN")
                             .requestMatchers(HttpMethod.PUT, "/user/updateUsuario").hasAnyRole("USER", "ADMIN")
-                            .requestMatchers(HttpMethod.GET, "/user/buscar/").hasAnyRole("ADMIN", "USER")
-                            .requestMatchers(HttpMethod.GET, "/user/listar/").hasAnyRole("ADMIN", "USER")
+                            .requestMatchers(HttpMethod.GET, "/user/buscar").hasAnyRole("ADMIN", "USER")
+                            .requestMatchers(HttpMethod.GET, "/user/listar").hasAnyRole("ADMIN", "USER")
                             .anyRequest().authenticated();
                 })
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)

@@ -3,7 +3,8 @@ package com.carcara.imagem_backend_security.enums;
 public enum UserRole {
 
     ADMIN("admin"),
-    USER("user");
+    USER("user"),
+    ACEITETERMO("aceitetermo");
 
     private String role;
 

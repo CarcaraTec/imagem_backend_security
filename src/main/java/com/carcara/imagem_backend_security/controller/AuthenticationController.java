@@ -1,13 +1,18 @@
 package com.carcara.imagem_backend_security.controller;
 
 import com.carcara.imagem_backend_security.enums.StatusRegister;
+import com.carcara.imagem_backend_security.enums.UserRole;
+import com.carcara.imagem_backend_security.exception.AceiteTermoException;
 import com.carcara.imagem_backend_security.exception.ApiException;
+import com.carcara.imagem_backend_security.exception.ErrorResponseTermoNaoAceito;
+import com.carcara.imagem_backend_security.exception.ValidacaoException;
 import com.carcara.imagem_backend_security.infra.config.TokenService;
 import com.carcara.imagem_backend_security.model.AuthenticationDTO;
 import com.carcara.imagem_backend_security.model.LoginResponseDTO;
 import com.carcara.imagem_backend_security.model.RegisterDTO;
 import com.carcara.imagem_backend_security.model.User;
 import com.carcara.imagem_backend_security.repository.UserRepository;
+import com.carcara.imagem_backend_security.service.TermoService;
 import com.carcara.imagem_backend_security.service.UserService;
 import com.carcara.imagem_backend_security.service.validador.login.ValidadorLogin;
 import io.swagger.v3.oas.annotations.Operation;
@@ -39,21 +44,27 @@ public class AuthenticationController {
     private UserService userService;
     @Autowired
     private List<ValidadorLogin> validadores;
+    @Autowired
+    private TermoService termoService;
 
     @PostMapping("/login")
     @Operation(summary = "Logar")
     public ResponseEntity login(@RequestBody @Valid AuthenticationDTO data) throws ApiException {
-
-        userService.getRole(data.login());
-
         var usernamePassword = new UsernamePasswordAuthenticationToken(data.login(), data.password());
         var auth = this.authenticationManager.authenticate(usernamePassword);
         var user = (User) auth.getPrincipal();
-
-        validadores.forEach(v -> v.validar(user));
-
         var token = tokenService.generateToken(user);
-        return ResponseEntity.ok(new LoginResponseDTO(token.token(), user.getUserId(),user.getNome(), token.expiration()));
+
+        LoginResponseDTO dadosLogin = new LoginResponseDTO(token.token(), user.getUserId(),user.getNome(), token.expiration());
+
+        try {
+            validadores.forEach(v -> v.validar(user));
+        }catch (AceiteTermoException e){
+            ErrorResponseTermoNaoAceito response = new ErrorResponseTermoNaoAceito(dadosLogin, e.getMensagem(), e.getTermo());
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+        }
+
+        return ResponseEntity.ok(dadosLogin);
     }
 
     @PostMapping("/register")
