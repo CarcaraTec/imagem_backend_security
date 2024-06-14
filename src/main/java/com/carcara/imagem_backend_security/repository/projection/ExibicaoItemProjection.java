@@ -4,5 +4,9 @@ public interface ExibicaoItemProjection {
 
     Integer getIdItem();
     String getDescricao();
-    String getMandatorio();
+    Byte getMandatorio();
+
+    default Boolean isMandatorio() {
+        return getMandatorio() != null && getMandatorio() != 0;
+    }
 }

@@ -26,6 +26,6 @@ public class Item {
     private String dsItem;
 
     @Column(name = "SN_MANDATORIO")
-    private String snMandatorio;
+    private Boolean snMandatorio;
 
 }
