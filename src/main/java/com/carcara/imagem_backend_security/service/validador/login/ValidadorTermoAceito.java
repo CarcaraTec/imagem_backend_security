@@ -18,7 +18,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Component
-public class ValidadorTermoAceito implements ValidadorLogin{
+public class ValidadorTermoAceito{
 
     private static final String MANDATORY = "s";
     private final ItemUsuarioRepository itemUsuarioRepository;
@@ -30,7 +30,6 @@ public class ValidadorTermoAceito implements ValidadorLogin{
         this.termoService = termoService;
     }
 
-    @Override
     public void validar(User user) {
         if (user.getRole().equals(UserRole.ADMIN)) {
             return;
