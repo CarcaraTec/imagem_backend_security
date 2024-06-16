@@ -28,8 +28,7 @@ public class ItensUsuariosController {
     @Operation(summary = "Aceitar termo")
     @SecurityRequirement(name = "Bearer Authentication")
     public ResponseEntity adicionaItensUsuario(@RequestBody List<Integer> id) {
-        service.adicionaItensUsuario(id);
-        return ResponseEntity.ok().build();
+        return service.adicionaItensUsuario(id);
     }
 
     @PostMapping("/atualizar-itens")

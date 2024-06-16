@@ -1,13 +1,18 @@
 package com.carcara.imagem_backend_security.service;
 
 import com.carcara.imagem_backend_security.enums.StatusRegister;
+import com.carcara.imagem_backend_security.exception.AceiteTermoException;
 import com.carcara.imagem_backend_security.exception.ApiException;
+import com.carcara.imagem_backend_security.exception.ErrorResponseTermoNaoAceito;
+import com.carcara.imagem_backend_security.infra.config.TokenService;
 import com.carcara.imagem_backend_security.model.DadosAtualizacaoUsuario;
+import com.carcara.imagem_backend_security.model.LoginResponseDTO;
 import com.carcara.imagem_backend_security.model.RegisterDTO;
 import com.carcara.imagem_backend_security.model.User;
 import com.carcara.imagem_backend_security.repository.UserRepository;
 import com.carcara.imagem_backend_security.repository.key.ChavesAcessoRepository;
 import com.carcara.imagem_backend_security.repository.projection.DadosUsuarioProjection;
+import com.carcara.imagem_backend_security.service.validador.login.ValidadorLogin;
 import com.carcara.imagem_backend_security.util.EncryptionUtil;
 import com.carcara.imagem_backend_security.util.UsuarioLogado;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -15,6 +20,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -29,6 +35,12 @@ public class UserService {
     public static final String USUARIO_NAO_ENCONTRADO_NA_BASE = "Usuário não encontrado na base";
 
     @Autowired
+    private TokenService tokenService;
+
+    @Autowired
+    private List<ValidadorLogin> validadores;
+
+    @Autowired
     private UsuarioLogado usuarioLogado;
     private final UserRepository userRepository;
     private final ChavesAcessoRepository chavesAcessoRepository;
@@ -37,6 +49,20 @@ public class UserService {
     public UserService(UserRepository userRepository, ChavesAcessoRepository chavesAcessoRepository) {
         this.userRepository = userRepository;
         this.chavesAcessoRepository = chavesAcessoRepository;
+    }
+
+    public ResponseEntity logar(User user){
+        var token = tokenService.generateToken(user);
+
+        LoginResponseDTO dadosLogin = new LoginResponseDTO(token.token(), user.getUserId(),user.getNome(), token.expiration(), user.getRole().getRole());
+
+        try {
+            validadores.forEach(v -> v.validar(user));
+        }catch (AceiteTermoException e){
+            ErrorResponseTermoNaoAceito response = new ErrorResponseTermoNaoAceito(dadosLogin);
+            return ResponseEntity.ok().body(response);
+        }
+        return ResponseEntity.ok().body(dadosLogin);
     }
 
     public DadosUsuarioProjection getDadosUsuario() throws ApiException {
