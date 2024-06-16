@@ -42,8 +42,7 @@ public class AuthenticationController {
     private TokenService tokenService;
     @Autowired
     private UserService userService;
-    @Autowired
-    private List<ValidadorLogin> validadores;
+
     @Autowired
     private TermoService termoService;
 
@@ -53,19 +52,11 @@ public class AuthenticationController {
         var usernamePassword = new UsernamePasswordAuthenticationToken(data.login(), data.password());
         var auth = this.authenticationManager.authenticate(usernamePassword);
         var user = (User) auth.getPrincipal();
-        var token = tokenService.generateToken(user);
 
-        LoginResponseDTO dadosLogin = new LoginResponseDTO(token.token(), user.getUserId(),user.getNome(), token.expiration());
-
-        try {
-            validadores.forEach(v -> v.validar(user));
-        }catch (AceiteTermoException e){
-            ErrorResponseTermoNaoAceito response = new ErrorResponseTermoNaoAceito(dadosLogin, e.getMensagem(), e.getTermo());
-            return ResponseEntity.status(HttpStatus.OK).body(response);
-        }
-
-        return ResponseEntity.ok(dadosLogin);
+        return userService.logar(user);
     }
+
+
 
     @PostMapping("/register")
     @Operation(summary = "Registrar")
