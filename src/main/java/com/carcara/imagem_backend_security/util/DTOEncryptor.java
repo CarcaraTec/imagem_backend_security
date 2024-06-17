@@ -12,7 +12,7 @@ import java.util.List;
 
 public class DTOEncryptor {
 
-    private static List<String> camposEncript = new ArrayList<>(Arrays.asList("cpf", "email", "foto", "nome", "telefone", "username"));
+    private static List<String> camposEncript = new ArrayList<>(Arrays.asList("cpf", "email", "foto", "nome", "telefone", "username","login"));
 
 
     public static <T> void encryptDTO(T registerDTO, SecretKey secretKey) throws Exception {

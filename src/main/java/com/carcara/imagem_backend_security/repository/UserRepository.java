@@ -38,6 +38,7 @@ public interface UserRepository extends JpaRepository<User, Integer> {
             " WHERE user_id = :id ", nativeQuery = true)
     void updateStatusAceito(@Param("id") Integer id);
 
+
     @Transactional
     @Modifying
     @Query(value = " UPDATE users " +

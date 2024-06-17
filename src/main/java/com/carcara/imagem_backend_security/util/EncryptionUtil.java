@@ -34,5 +34,4 @@ public class EncryptionUtil {
         byte[] decodedKey = Base64.getDecoder().decode(keyString);
         return new javax.crypto.spec.SecretKeySpec(decodedKey, 0, decodedKey.length, "AES");
     }
-
 }

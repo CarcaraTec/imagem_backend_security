@@ -72,5 +72,11 @@ public class UserController {
         return ResponseEntity.ok().body(users);
     }
 
+    @DeleteMapping("/delete-account")
+    @SecurityRequirement(name = "Bearer Authentication")
+    public ResponseEntity deletarUsuarioLogado(){
+        service.deletarUsuarioLogado();
+        return ResponseEntity.ok().build();
+    }
 
 }

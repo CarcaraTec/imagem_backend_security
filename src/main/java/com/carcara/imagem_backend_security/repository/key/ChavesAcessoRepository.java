@@ -22,4 +22,10 @@ public interface ChavesAcessoRepository extends JpaRepository<ChavesAcesso, Inte
             " WHERE ID_USER = :idUsuario", nativeQuery = true)
     String getEncrypted(@Param("idUsuario") Integer idUsuario);
 
+    @Modifying
+    @Transactional
+    @Query(value = "DELETE FROM key_management_master.key_management" +
+            " WHERE ID_USER = :idUsuario", nativeQuery = true)
+    void deleteKey(@Param("idUsuario") Integer idUsuario);
+
 }
