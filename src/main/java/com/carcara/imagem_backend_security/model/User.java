@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -18,6 +19,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
+@Setter
 public class User implements UserDetails {
 
     @Id
@@ -66,18 +68,28 @@ public class User implements UserDetails {
         this.username = data.login();
         this.email = data.email();
         this.cpf = data.cpf();
-        this.role = data.role();
+        this.role = UserRole.ACEITETERMO;
         this.password = encryptedPassword;
         this.nome = data.nome();
-        this.status = data.status();
+        this.status = StatusRegister.AGUARDANDO;
         this.telefone = data.telefone();
         this.foto = data.foto();
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        if(this.role == UserRole.ADMIN) return List.of(new SimpleGrantedAuthority("ROLE_ADMIN"), new SimpleGrantedAuthority("ROLE_USER"));
-        else return List.of(new SimpleGrantedAuthority("ROLE_USER"));
+        if(this.role == UserRole.ADMIN) {
+            return List.of(
+                new SimpleGrantedAuthority("ROLE_ADMIN"),
+                new SimpleGrantedAuthority("ROLE_USER"));
+        }
+        else if(this.role == UserRole.USER) {
+            return List.of(
+                    new SimpleGrantedAuthority("ROLE_USER"));
+        }
+        else{
+            return List.of(new SimpleGrantedAuthority("ACEITETERMO"));
+        }
     }
 
     @Override
@@ -109,14 +121,8 @@ public class User implements UserDetails {
         if (dados.nome() != null) {
             this.nome = dados.nome();
         }
-        if (dados.username() != null) {
-            this.username = dados.username();
-        }
         if (dados.cpf() != null) {
             this.cpf = dados.cpf();
-        }
-        if (dados.email() != null) {
-            this.email = dados.email();
         }
         if (dados.telefone() != null) {
             this.telefone = dados.telefone();

@@ -1,4 +1,7 @@
 package com.carcara.imagem_backend_security.model;
 
-public record LoginResponseDTO(String token, Integer userId, String nome) {
+
+import java.time.Instant;
+
+public record LoginResponseDTO(String token, Integer userId, String nome, Instant expiration, String role) {
 }

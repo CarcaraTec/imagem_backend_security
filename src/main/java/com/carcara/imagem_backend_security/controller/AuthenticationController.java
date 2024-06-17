@@ -1,19 +1,34 @@
 package com.carcara.imagem_backend_security.controller;
 
+import com.carcara.imagem_backend_security.enums.StatusRegister;
+import com.carcara.imagem_backend_security.enums.UserRole;
+import com.carcara.imagem_backend_security.exception.AceiteTermoException;
+import com.carcara.imagem_backend_security.exception.ApiException;
+import com.carcara.imagem_backend_security.exception.ErrorResponseTermoNaoAceito;
+import com.carcara.imagem_backend_security.exception.ValidacaoException;
 import com.carcara.imagem_backend_security.infra.config.TokenService;
-import com.carcara.imagem_backend_security.model.AuthenticationDTO;
-import com.carcara.imagem_backend_security.model.LoginResponseDTO;
-import com.carcara.imagem_backend_security.model.RegisterDTO;
-import com.carcara.imagem_backend_security.model.User;
+import com.carcara.imagem_backend_security.model.*;
 import com.carcara.imagem_backend_security.repository.UserRepository;
+import com.carcara.imagem_backend_security.repository.key.ChavesAcessoRepository;
+import com.carcara.imagem_backend_security.service.TermoService;
 import com.carcara.imagem_backend_security.service.UserService;
+import com.carcara.imagem_backend_security.service.validador.login.ValidadorLogin;
+import com.carcara.imagem_backend_security.util.DTOEncryptor;
+import com.carcara.imagem_backend_security.util.EncryptionUtil;
+import com.carcara.imagem_backend_security.util.UsuarioAdmUtil;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
+
+import javax.crypto.SecretKey;
+import javax.management.relation.Role;
+import java.util.List;
 
 @RestController
 @RequestMapping("/auth")
@@ -30,18 +45,29 @@ public class AuthenticationController {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private TermoService termoService;
+
+    @Autowired
+    private ChavesAcessoRepository chavesAcessoRepository;
+
+
     @PostMapping("/login")
-    public ResponseEntity login(@RequestBody @Valid AuthenticationDTO data){
-        var usernamePassword = new UsernamePasswordAuthenticationToken(data.login(), data.password());
+    @Operation(summary = "Logar")
+    public ResponseEntity login(@RequestBody @Valid AuthenticationDTO data) throws Exception {
+        String username = userService.encontrarUsuario(data.login());
+        var usernamePassword = new UsernamePasswordAuthenticationToken(username, data.password());
         var auth = this.authenticationManager.authenticate(usernamePassword);
         var user = (User) auth.getPrincipal();
 
-        var token = tokenService.generateToken(user);
-        return ResponseEntity.ok(new LoginResponseDTO(token, user.getUserId(),user.getNome()));
+
+        return userService.logar(user);
     }
 
+
     @PostMapping("/register")
-    public ResponseEntity register(@RequestBody @Valid RegisterDTO data) {
+    @Operation(summary = "Registrar")
+    public ResponseEntity register(@RequestBody @Valid RegisterDTO data) throws Exception {
         if (this.userRepository.findByUsername(data.login()) != null) {
             return ResponseEntity.badRequest().build();
         }

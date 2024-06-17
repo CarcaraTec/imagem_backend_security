@@ -1,7 +1,7 @@
 package com.carcara.imagem_backend_security.repository;
 
+import com.carcara.imagem_backend_security.enums.StatusRegister;
 import com.carcara.imagem_backend_security.model.User;
-import com.carcara.imagem_backend_security.repository.projection.DadosUsuarioAguardandoProjection;
 import com.carcara.imagem_backend_security.repository.projection.DadosUsuarioProjection;
 import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -19,28 +19,22 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     UserDetails findByUsername(String username);
 
     @Query(value = " SELECT " +
+            "user_id, " +
             " username AS username, " +
             " email AS email, " +
             " cpf AS cpf, " +
             " nome AS nome, " +
-            " telefone AS telefone " +
+            " telefone AS telefone," +
+            "status AS status " +
             " FROM users " +
             " WHERE cpf = :cpf ", nativeQuery = true)
     DadosUsuarioProjection getDadosUsuario(@Param("cpf") String cpf);
 
-    @Query(value = " SELECT " +
-            " user_id AS userId, " +
-            " nome AS nome, " +
-            " telefone AS telefone, " +
-            " email AS email" +
-            " FROM users " +
-            " WHERE status = 'AGUARDANDO' ", nativeQuery = true)
-    List<DadosUsuarioAguardandoProjection> getUsuarioStatusAguardando();
-
     @Transactional
     @Modifying
     @Query(value = " UPDATE users " +
-            " SET status = 'ATIVO' " +
+            " SET status = 'ATIVO', " +
+            " role = 'ACEITETERMO' " +
             " WHERE user_id = :id ", nativeQuery = true)
     void updateStatusAceito(@Param("id") Integer id);
 
@@ -54,4 +48,21 @@ public interface UserRepository extends JpaRepository<User, Integer> {
 
     @Query(value = "SELECT * FROM users WHERE user_id = :id", nativeQuery = true)
     DadosUsuarioProjection findByIdProject(@Param("id") Integer id);
+
+    @Query(value = " SELECT ROLE FROM USERS WHERE USERNAME = :login ", nativeQuery = true)
+    String getRole(String login);
+
+    @Query(value = " SELECT " +
+            "user_id, " +
+            " username AS username, " +
+            " email AS email, " +
+            " cpf AS cpf, " +
+            " nome AS nome, " +
+            " telefone AS telefone, " +
+            "status AS status " +
+            " FROM users " +
+            " WHERE status != 'RECUSADO' " +
+            "AND (:status is null or status = :status) " +
+            "AND user_id != :id", nativeQuery = true)
+    List<DadosUsuarioProjection> findAllUsers(@Param("status")String status, @Param("id") Integer id);
 }
