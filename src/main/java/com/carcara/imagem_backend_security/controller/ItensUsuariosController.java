@@ -27,7 +27,7 @@ public class ItensUsuariosController {
     @PostMapping("/aceitar")
     @Operation(summary = "Aceitar termo")
     @SecurityRequirement(name = "Bearer Authentication")
-    public ResponseEntity adicionaItensUsuario(@RequestBody List<Integer> id) {
+    public ResponseEntity adicionaItensUsuario(@RequestBody List<Integer> id) throws Exception {
         return service.adicionaItensUsuario(id);
     }
 

@@ -56,7 +56,7 @@ public class ItemUsuarioService {
 
     @Transactional
     @Modifying
-    public ResponseEntity adicionaItensUsuario(List<Integer> ids) {
+    public ResponseEntity adicionaItensUsuario(List<Integer> ids) throws Exception {
         User user = usuarioLogado.resgatarUsuario();
         RetornarTermo termoAtual = termoService.exibirTermo();
 

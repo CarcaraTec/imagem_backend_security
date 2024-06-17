@@ -18,4 +18,8 @@ public interface ChavesAcessoRepository extends JpaRepository<ChavesAcesso, Inte
     void salvarEncrypted(@Param("idUsuario") Integer idUsuario,
                          @Param("descKey") String descKey);
 
+    @Query(value = " SELECT DS_KEY FROM key_management_master.key_management" +
+            " WHERE ID_USER = :idUsuario", nativeQuery = true)
+    String getEncrypted(@Param("idUsuario") Integer idUsuario);
+
 }

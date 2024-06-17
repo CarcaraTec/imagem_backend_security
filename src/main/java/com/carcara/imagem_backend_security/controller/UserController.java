@@ -51,7 +51,7 @@ public class UserController {
     @SecurityRequirement(name = "Bearer Authentication")
     @GetMapping("/buscar/{id}")
     @Operation(summary = "Busca usuario pelo id")
-    public ResponseEntity buscarPorId(@PathVariable("id") Integer id) {
+    public ResponseEntity buscarPorId(@PathVariable("id") Integer id) throws Exception {
         return ResponseEntity.ok().body(service.buscarPeloId(id));
     }
 
@@ -59,7 +59,7 @@ public class UserController {
     @PutMapping("/updateUsuario")
     @Operation(summary = "Atualiza dados do usuario")
     @Transactional
-    public ResponseEntity updateUsuario(@RequestBody @Valid DadosAtualizacaoUsuario dadosAtualizacaoUsuario) throws ApiException {
+    public ResponseEntity updateUsuario(@RequestBody @Valid DadosAtualizacaoUsuario dadosAtualizacaoUsuario) throws Exception {
         service.updateUsuario(dadosAtualizacaoUsuario);
         return ResponseEntity.ok().build();
     }

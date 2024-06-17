@@ -5,15 +5,14 @@ import com.carcara.imagem_backend_security.exception.AceiteTermoException;
 import com.carcara.imagem_backend_security.exception.ApiException;
 import com.carcara.imagem_backend_security.exception.ErrorResponseTermoNaoAceito;
 import com.carcara.imagem_backend_security.infra.config.TokenService;
-import com.carcara.imagem_backend_security.model.DadosAtualizacaoUsuario;
-import com.carcara.imagem_backend_security.model.LoginResponseDTO;
-import com.carcara.imagem_backend_security.model.RegisterDTO;
-import com.carcara.imagem_backend_security.model.User;
+import com.carcara.imagem_backend_security.model.*;
 import com.carcara.imagem_backend_security.repository.UserRepository;
 import com.carcara.imagem_backend_security.repository.key.ChavesAcessoRepository;
 import com.carcara.imagem_backend_security.repository.projection.DadosUsuarioProjection;
 import com.carcara.imagem_backend_security.service.validador.login.ValidadorLogin;
+import com.carcara.imagem_backend_security.util.DTOEncryptor;
 import com.carcara.imagem_backend_security.util.EncryptionUtil;
+import com.carcara.imagem_backend_security.util.UsuarioAdmUtil;
 import com.carcara.imagem_backend_security.util.UsuarioLogado;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
@@ -27,6 +26,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
 import javax.crypto.SecretKey;
+import java.util.Base64;
 import java.util.List;
 
 @Service
@@ -37,6 +37,8 @@ public class UserService {
     @Autowired
     private TokenService tokenService;
 
+    @Autowired
+    private UsuarioAdmUtil usuarioAdmUtil;
     @Autowired
     private List<ValidadorLogin> validadores;
 
@@ -51,9 +53,12 @@ public class UserService {
         this.chavesAcessoRepository = chavesAcessoRepository;
     }
 
-    public ResponseEntity logar(User user){
+    public ResponseEntity logar(User user) throws Exception {
         var token = tokenService.generateToken(user);
-
+        System.out.println(chavesAcessoRepository.getEncrypted(user.getUserId()));
+        String chave = chavesAcessoRepository.getEncrypted(user.getUserId());
+        SecretKey secretKey = EncryptionUtil.convertStringToSecretKey(chave);
+        DTOEncryptor.decryptDTO(user, secretKey);
         LoginResponseDTO dadosLogin = new LoginResponseDTO(token.token(), user.getUserId(),user.getNome(), token.expiration(), user.getRole().getRole());
 
         try {
@@ -65,6 +70,20 @@ public class UserService {
         return ResponseEntity.ok().body(dadosLogin);
     }
 
+    public String encontrarUsuario(String username){
+        User user = new User();
+        List<UserLogin> usuarios = usuarioAdmUtil.getUsers();
+        for(UserLogin userLogin : usuarios){
+            if(userLogin.username().equals(username)){
+                user = userRepository.findById(userLogin.userId()).orElseThrow();
+                break;
+            }
+            throw new RuntimeException();
+        }
+        return user.getUsername();
+    }
+
+
     public DadosUsuarioProjection getDadosUsuario() throws ApiException {
         User userLogado = usuarioLogado.resgatarUsuario();
         DadosUsuarioProjection dados = userRepository.getDadosUsuario(userLogado.getCpf());
@@ -75,13 +94,18 @@ public class UserService {
         return dados;
     }
 
-    public DadosUsuarioProjection buscarPeloId(Integer id){
-        DadosUsuarioProjection user = userRepository.findByIdProject(id);
+    public User buscarPeloId(Integer id) throws Exception {
+        User user = userRepository.findById(id).orElseThrow();
+        String chave = chavesAcessoRepository.getEncrypted(user.getUserId());
+        SecretKey secretKey = EncryptionUtil.convertStringToSecretKey(chave);
+        DTOEncryptor.decryptDTO(user, secretKey);
         return user;
     }
 
     @Transactional
     public void criarUsuario(RegisterDTO data) throws Exception {
+        SecretKey secretKey = EncryptionUtil.generateKey();
+
         RegisterDTO register = new RegisterDTO(
                 data.login(),
                 data.password(),
@@ -91,24 +115,34 @@ public class UserService {
                 data.telefone(),
                 data.foto()
                 );
-        String encryptedPassword = new BCryptPasswordEncoder().encode(register.password());
+
+        DTOEncryptor dtoEncryptor = new DTOEncryptor();
+        dtoEncryptor.encryptDTO(register, secretKey);
+        String encryptedPassword = new BCryptPasswordEncoder().encode(data.password());
+
         User newUser = new User(register, encryptedPassword);
 
         User savedUser = this.userRepository.save(newUser);
 
-        encryptedUser(savedUser);
-
+        encryptedUser(savedUser, secretKey);
+        usuarioAdmUtil.carregarUsuario(savedUser.getUserId(), data.login(), savedUser.getPassword());
     }
 
     @Transactional
-    public void encryptedUser(User savedUser) throws Exception {
-        SecretKey secretKey = EncryptionUtil.generateKey();
-        ObjectMapper objectMapper = new ObjectMapper();
-        String jsonString = objectMapper.writeValueAsString(savedUser);
-        String encryptedString = EncryptionUtil.encrypt(jsonString, secretKey);
+    public void encryptedUser(User savedUser, SecretKey secretKey) throws Exception {
+//        ObjectMapper objectMapper = new ObjectMapper();
+//        String jsonString = objectMapper.writeValueAsString(savedUser);
+//        String encryptedString = EncryptionUtil.encrypt(jsonString, secretKey);
 
-        salvarUsuario(savedUser.getUserId(), encryptedString);
+        salvarUsuario(savedUser.getUserId(), convertSecretKeyToString(secretKey));
     }
+
+    public static String convertSecretKeyToString(SecretKey secretKey) {
+        byte[] keyBytes = secretKey.getEncoded();
+        return Base64.getEncoder().encodeToString(keyBytes);
+    }
+
+
 
     @Transactional
     public void salvarUsuario(Integer userId, String encryptedString) {
@@ -126,9 +160,13 @@ public class UserService {
     }
 
     @Modifying
-    public void updateUsuario(DadosAtualizacaoUsuario dadosAtualizacaoUsuario) throws ApiException {
+    public void updateUsuario(DadosAtualizacaoUsuario dadosAtualizacaoUsuario) throws Exception {
         var usuario = userRepository.getReferenceById(dadosAtualizacaoUsuario.userId());
+        String chave = chavesAcessoRepository.getEncrypted(usuario.getUserId());
 
+        SecretKey secretKey = EncryptionUtil.convertStringToSecretKey(chave);
+
+        DTOEncryptor.encryptDTO(dadosAtualizacaoUsuario, secretKey);
         if (ObjectUtils.isEmpty(usuario)) {
             throw new ApiException("Nenhum usuário encontrado", HttpStatus.NO_CONTENT);
         }
