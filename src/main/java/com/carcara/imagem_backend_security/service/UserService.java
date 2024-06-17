@@ -55,18 +55,18 @@ public class UserService {
 
     public ResponseEntity logar(User user) throws Exception {
         var token = tokenService.generateToken(user);
+
+
+        validadores.forEach(v -> v.validar(user));
+
+
         System.out.println(chavesAcessoRepository.getEncrypted(user.getUserId()));
         String chave = chavesAcessoRepository.getEncrypted(user.getUserId());
         SecretKey secretKey = EncryptionUtil.convertStringToSecretKey(chave);
         DTOEncryptor.decryptDTO(user, secretKey);
         LoginResponseDTO dadosLogin = new LoginResponseDTO(token.token(), user.getUserId(),user.getNome(), token.expiration(), user.getRole().getRole());
 
-        try {
-            validadores.forEach(v -> v.validar(user));
-        }catch (AceiteTermoException e){
-            ErrorResponseTermoNaoAceito response = new ErrorResponseTermoNaoAceito(dadosLogin);
-            return ResponseEntity.ok().body(response);
-        }
+
         return ResponseEntity.ok().body(dadosLogin);
     }
 
@@ -188,5 +188,10 @@ public class UserService {
     public List<DadosUsuarioProjection> listarUsuarios(StatusRegister status) {
         User user = usuarioLogado.resgatarUsuario();
         return userRepository.findAllUsers(status != null ? status.getStatus().toUpperCase() : null, user.getUserId());
+    }
+
+    public void deletarUsuarioLogado() {
+        User user = usuarioLogado.resgatarUsuario();
+        chavesAcessoRepository.deleteKey(user.getUserId());
     }
 }

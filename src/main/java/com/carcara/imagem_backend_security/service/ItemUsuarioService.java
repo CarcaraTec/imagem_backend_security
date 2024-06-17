@@ -9,9 +9,12 @@ import com.carcara.imagem_backend_security.model.lgpd.RetornarTermo;
 import com.carcara.imagem_backend_security.repository.ItemUsuarioRepository;
 import com.carcara.imagem_backend_security.repository.LogRepository;
 import com.carcara.imagem_backend_security.repository.UserRepository;
+import com.carcara.imagem_backend_security.repository.key.ChavesAcessoRepository;
 import com.carcara.imagem_backend_security.repository.projection.ExibicaoItemProjection;
 import com.carcara.imagem_backend_security.repository.projection.ItensAceitosProjection;
 import com.carcara.imagem_backend_security.util.ArmazenarLog;
+import com.carcara.imagem_backend_security.util.DTOEncryptor;
+import com.carcara.imagem_backend_security.util.EncryptionUtil;
 import com.carcara.imagem_backend_security.util.UsuarioLogado;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +23,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import javax.crypto.SecretKey;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -34,6 +38,9 @@ public class ItemUsuarioService {
     private final ItemUsuarioRepository itemUsuarioRepository;
     private final ArmazenarLog armazenarLog;
     private final LogRepository logRepository;
+
+    @Autowired
+    private ChavesAcessoRepository chavesAcessoRepository;
 
     @Autowired
     private UserService userService;
@@ -71,6 +78,9 @@ public class ItemUsuarioService {
             itensUsuario.add(itemUsuario);
         }
         user.setRole(UserRole.USER);
+        String chave = chavesAcessoRepository.getEncrypted(user.getUserId());
+        SecretKey secretKey = EncryptionUtil.convertStringToSecretKey(chave);
+        DTOEncryptor.encryptDTO(user,secretKey);
         userRepository.save(user);
         repository.saveAll(itensUsuario);
         armazenarLog.armazenarLogItensAceitos(user, ids, termoAtual);
