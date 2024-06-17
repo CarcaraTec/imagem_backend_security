@@ -7,14 +7,15 @@ import com.carcara.imagem_backend_security.exception.ApiException;
 import com.carcara.imagem_backend_security.exception.ErrorResponseTermoNaoAceito;
 import com.carcara.imagem_backend_security.exception.ValidacaoException;
 import com.carcara.imagem_backend_security.infra.config.TokenService;
-import com.carcara.imagem_backend_security.model.AuthenticationDTO;
-import com.carcara.imagem_backend_security.model.LoginResponseDTO;
-import com.carcara.imagem_backend_security.model.RegisterDTO;
-import com.carcara.imagem_backend_security.model.User;
+import com.carcara.imagem_backend_security.model.*;
 import com.carcara.imagem_backend_security.repository.UserRepository;
+import com.carcara.imagem_backend_security.repository.key.ChavesAcessoRepository;
 import com.carcara.imagem_backend_security.service.TermoService;
 import com.carcara.imagem_backend_security.service.UserService;
 import com.carcara.imagem_backend_security.service.validador.login.ValidadorLogin;
+import com.carcara.imagem_backend_security.util.DTOEncryptor;
+import com.carcara.imagem_backend_security.util.EncryptionUtil;
+import com.carcara.imagem_backend_security.util.UsuarioAdmUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -25,6 +26,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 
+import javax.crypto.SecretKey;
 import javax.management.relation.Role;
 import java.util.List;
 
@@ -46,16 +48,21 @@ public class AuthenticationController {
     @Autowired
     private TermoService termoService;
 
+    @Autowired
+    private ChavesAcessoRepository chavesAcessoRepository;
+
+
     @PostMapping("/login")
     @Operation(summary = "Logar")
-    public ResponseEntity login(@RequestBody @Valid AuthenticationDTO data) throws ApiException {
-        var usernamePassword = new UsernamePasswordAuthenticationToken(data.login(), data.password());
+    public ResponseEntity login(@RequestBody @Valid AuthenticationDTO data) throws Exception {
+        String username = userService.encontrarUsuario(data.login());
+        var usernamePassword = new UsernamePasswordAuthenticationToken(username, data.password());
         var auth = this.authenticationManager.authenticate(usernamePassword);
         var user = (User) auth.getPrincipal();
 
+
         return userService.logar(user);
     }
-
 
 
     @PostMapping("/register")

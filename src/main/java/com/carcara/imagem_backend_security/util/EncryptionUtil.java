@@ -18,18 +18,21 @@ public class EncryptionUtil {
         return Base64.getEncoder().encodeToString(encryptedBytes);
     }
 
-    public static String decrypt(String input, SecretKey key, byte[] iv) throws Exception {
-        Cipher cipher = Cipher.getInstance(TRANSFORMATION);
-        IvParameterSpec ivParameterSpec = new IvParameterSpec(iv);
-        cipher.init(Cipher.DECRYPT_MODE, key, ivParameterSpec);
-        byte[] decryptedBytes = cipher.doFinal(Base64.getDecoder().decode(input));
-        return new String(decryptedBytes);
+    public static String decrypt(String strToDecrypt, SecretKey secretKey) throws Exception {
+        Cipher cipher = Cipher.getInstance("AES");
+        cipher.init(Cipher.DECRYPT_MODE, secretKey);
+        return new String(cipher.doFinal(Base64.getDecoder().decode(strToDecrypt)));
     }
 
     public static SecretKey generateKey() throws Exception {
         KeyGenerator keyGen = KeyGenerator.getInstance(ALGORITHM);
         keyGen.init(256);
         return keyGen.generateKey();
+    }
+
+    public static SecretKey convertStringToSecretKey(String keyString) {
+        byte[] decodedKey = Base64.getDecoder().decode(keyString);
+        return new javax.crypto.spec.SecretKeySpec(decodedKey, 0, decodedKey.length, "AES");
     }
 
 }
