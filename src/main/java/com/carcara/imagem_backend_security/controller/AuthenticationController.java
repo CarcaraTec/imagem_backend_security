@@ -38,10 +38,13 @@ public class AuthenticationController {
 
     @Autowired
     private AuthenticationManager authenticationManager;
+
     @Autowired
     private UserRepository userRepository;
+
     @Autowired
     private TokenService tokenService;
+
     @Autowired
     private UserService userService;
 
@@ -59,7 +62,6 @@ public class AuthenticationController {
         var usernamePassword = new UsernamePasswordAuthenticationToken(username, data.password());
         var auth = this.authenticationManager.authenticate(usernamePassword);
         var user = (User) auth.getPrincipal();
-
 
         return userService.logar(user);
     }

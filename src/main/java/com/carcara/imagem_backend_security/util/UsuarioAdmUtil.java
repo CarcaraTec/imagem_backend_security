@@ -33,11 +33,13 @@ public class UsuarioAdmUtil {
 
     @PostConstruct
     public void init() throws Exception {
-        this.users = getUsuarios().stream().map(user -> new UserLogin(user)).toList();
+        this.users = new ArrayList<>(getUsuarios().stream().map(user -> new UserLogin(user)).toList());
     }
 
     public void carregarUsuario(Integer userId, String username, String password) throws Exception {
-        this.users = List.of(new UserLogin(userId, username, password));
+        List<UserLogin> todosUsuarios = getUsers();
+        todosUsuarios.add(new UserLogin(userId, username, password));
+        this.users = todosUsuarios;
     }
 
     public List<User> getUsuarios() throws Exception {
