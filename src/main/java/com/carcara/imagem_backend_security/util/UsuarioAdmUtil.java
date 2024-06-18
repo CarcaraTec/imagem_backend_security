@@ -45,8 +45,10 @@ public class UsuarioAdmUtil {
 
         for (User user : usuario) {
             String chave = chavesAcessoRepository.getEncrypted(user.getUserId());
-            SecretKey secretKey = EncryptionUtil.convertStringToSecretKey(chave);
-            DTOEncryptor.decryptDTO(user,secretKey);
+            if(chave != null){
+                SecretKey secretKey = EncryptionUtil.convertStringToSecretKey(chave);
+                DTOEncryptor.decryptDTO(user,secretKey);
+            }
         }
 
         return usuario;

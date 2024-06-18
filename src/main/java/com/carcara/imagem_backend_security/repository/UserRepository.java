@@ -52,17 +52,6 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     @Query(value = " SELECT ROLE FROM USERS WHERE USERNAME = :login ", nativeQuery = true)
     String getRole(String login);
 
-    @Query(value = " SELECT " +
-            "user_id, " +
-            " username AS username, " +
-            " email AS email, " +
-            " cpf AS cpf, " +
-            " nome AS nome, " +
-            " telefone AS telefone, " +
-            "status AS status " +
-            " FROM users " +
-            " WHERE status != 'RECUSADO' " +
-            "AND (:status is null or status = :status) " +
-            "AND user_id != :id", nativeQuery = true)
-    List<DadosUsuarioProjection> findAllUsers(@Param("status")String status, @Param("id") Integer id);
+    List<User> findByStatusNotAndUserIdNot(StatusRegister status, Integer id);
+
 }

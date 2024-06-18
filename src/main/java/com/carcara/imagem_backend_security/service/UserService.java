@@ -26,8 +26,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
 import javax.crypto.SecretKey;
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
@@ -65,8 +67,6 @@ public class UserService {
         SecretKey secretKey = EncryptionUtil.convertStringToSecretKey(chave);
         DTOEncryptor.decryptDTO(user, secretKey);
         LoginResponseDTO dadosLogin = new LoginResponseDTO(token.token(), user.getUserId(),user.getNome(), token.expiration(), user.getRole().getRole());
-
-
         return ResponseEntity.ok().body(dadosLogin);
     }
 
@@ -78,7 +78,6 @@ public class UserService {
                 user = userRepository.findById(userLogin.userId()).orElseThrow();
                 break;
             }
-            throw new RuntimeException();
         }
         return user.getUsername();
     }
@@ -185,9 +184,31 @@ public class UserService {
         return role;
     }
 
-    public List<DadosUsuarioProjection> listarUsuarios(StatusRegister status) {
+    public List<User> listarUsuarios(StatusRegister status) throws Exception {
         User user = usuarioLogado.resgatarUsuario();
-        return userRepository.findAllUsers(status != null ? status.getStatus().toUpperCase() : null, user.getUserId());
+        descriptografarUsuario(user);
+        List<User> usuarios = userRepository.findByStatusNotAndUserIdNot(StatusRegister.RECUSADO, user.getUserId());
+
+        List<User> usuariosDescriptografados = new ArrayList<>();
+
+        for (User user1 : usuarios){
+            User userDecript = descriptografarUsuario(user1);
+            if(userDecript!= null){
+                usuariosDescriptografados.add(userDecript);
+            }
+        }
+
+        return usuariosDescriptografados;
+    }
+
+    public User descriptografarUsuario(User user) throws Exception {
+        String chave = chavesAcessoRepository.getEncrypted(user.getUserId());
+        if(chave != null){
+            SecretKey secretKey = EncryptionUtil.convertStringToSecretKey(chave);
+            DTOEncryptor.decryptDTO(user,secretKey);
+            return user;
+        }
+        return null;
     }
 
     public void deletarUsuarioLogado() {
