@@ -45,6 +45,9 @@ public class UserService {
     private List<ValidadorLogin> validadores;
 
     @Autowired
+    private SharingService sharingService;
+
+    @Autowired
     private UsuarioLogado usuarioLogado;
     private final UserRepository userRepository;
     private final ChavesAcessoRepository chavesAcessoRepository;
@@ -116,6 +119,8 @@ public class UserService {
                 );
 
         DTOEncryptor dtoEncryptor = new DTOEncryptor();
+
+        sharingService.compartilhar(data);
         dtoEncryptor.encryptDTO(register, secretKey);
         String encryptedPassword = new BCryptPasswordEncoder().encode(data.password());
 

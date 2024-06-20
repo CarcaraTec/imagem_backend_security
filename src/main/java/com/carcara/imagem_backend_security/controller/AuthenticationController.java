@@ -54,7 +54,6 @@ public class AuthenticationController {
     @Autowired
     private ChavesAcessoRepository chavesAcessoRepository;
 
-
     @PostMapping("/login")
     @Operation(summary = "Logar")
     public ResponseEntity login(@RequestBody @Valid AuthenticationDTO data) throws Exception {
@@ -62,7 +61,6 @@ public class AuthenticationController {
         var usernamePassword = new UsernamePasswordAuthenticationToken(username, data.password());
         var auth = this.authenticationManager.authenticate(usernamePassword);
         var user = (User) auth.getPrincipal();
-
         return userService.logar(user);
     }
 
