@@ -47,6 +47,7 @@ public class UserService {
     @Autowired
     private SharingService sharingService;
 
+
     @Autowired
     private UsuarioLogado usuarioLogado;
     private final UserRepository userRepository;
@@ -63,7 +64,6 @@ public class UserService {
 
 
         validadores.forEach(v -> v.validar(user));
-
 
         System.out.println(chavesAcessoRepository.getEncrypted(user.getUserId()));
         String chave = chavesAcessoRepository.getEncrypted(user.getUserId());
@@ -120,9 +120,8 @@ public class UserService {
 
         DTOEncryptor dtoEncryptor = new DTOEncryptor();
 
-        sharingService.compartilhar(data);
         dtoEncryptor.encryptDTO(register, secretKey);
-        String encryptedPassword = new BCryptPasswordEncoder().encode(data.password());
+        String encryptedPassword = new BCryptPasswordEncoder().encode(register.password());
 
         User newUser = new User(register, encryptedPassword);
 
@@ -130,6 +129,7 @@ public class UserService {
 
         encryptedUser(savedUser, secretKey);
         usuarioAdmUtil.carregarUsuario(savedUser.getUserId(), data.login(), savedUser.getPassword());
+        sharingService.compartilhar(data);
     }
 
     @Transactional
@@ -218,6 +218,7 @@ public class UserService {
 
     public void deletarUsuarioLogado() {
         User user = usuarioLogado.resgatarUsuario();
+        sharingService.deleteSharingByUser(user.getUserId());
         chavesAcessoRepository.deleteKey(user.getUserId());
     }
 }

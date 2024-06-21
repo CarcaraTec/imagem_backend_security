@@ -31,7 +31,7 @@ public class SharingService {
     private ActionRepository actionRepository;
     @Autowired
     private UsuarioLogado usuarioLogado;
-    public void createWebhook(CreateWebhookDTO createWebhookDTO) throws Exception {
+    public String createWebhook(CreateWebhookDTO createWebhookDTO) throws Exception {
         SecretKey secretKey = EncryptionUtil.generateKey();
 
         User user = usuarioLogado.resgatarUsuario();
@@ -43,6 +43,7 @@ public class SharingService {
             sharingConfigList.add(new SharingConfig(sharing, action));
         }
         repository.saveAll(sharingConfigList);
+        return sharing.getSharingToken();
     }
 
     public void compartilhar(Object object) throws Exception {
@@ -76,5 +77,9 @@ public class SharingService {
 
         DTOEncryptor.decryptAllDTO(value, convertStringToSecretKey(sharing.getKey()));
         return value;
+    }
+
+    public void deleteSharingByUser(Integer userId){
+        sharingRepository.deleteAllByCreatedBy(userId);
     }
 }

@@ -6,6 +6,7 @@ import com.carcara.imagem_backend_security.model.DadosAtualizacaoUsuario;
 import com.carcara.imagem_backend_security.model.User;
 import com.carcara.imagem_backend_security.model.lgpd.Termo;
 import com.carcara.imagem_backend_security.repository.projection.DadosUsuarioProjection;
+import com.carcara.imagem_backend_security.service.SharingService;
 import com.carcara.imagem_backend_security.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -26,6 +27,8 @@ public class UserController {
 
     @Autowired
     UserService service;
+
+
 
     @SecurityRequirement(name = "Bearer Authentication")
     @GetMapping("/dadosPessoaisUsuarios")

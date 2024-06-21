@@ -31,6 +31,17 @@ public class UsuarioAdmUtil {
         return users;
     }
 
+    public void excluirUsuario(String username){
+        List<UserLogin> todosUsuarios = getUsers();
+        for(UserLogin userLogin : todosUsuarios){
+            if(userLogin.username().equals(username)){
+                todosUsuarios.remove(userLogin);
+                break;
+            }
+        }
+        this.users = todosUsuarios;;
+    }
+
     @PostConstruct
     public void init() throws Exception {
         this.users = new ArrayList<>(getUsuarios().stream().map(user -> new UserLogin(user)).toList());

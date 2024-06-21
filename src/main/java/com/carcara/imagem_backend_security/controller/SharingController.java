@@ -30,8 +30,7 @@ public class SharingController {
     @SecurityRequirement(name = "Bearer Authentication")
     @PostMapping("create-webhook")
     public ResponseEntity createWebhook(@RequestBody CreateWebhookDTO createWebhookDTO) throws Exception {
-        sharingService.createWebhook(createWebhookDTO);
-        return ResponseEntity.ok(createWebhookDTO);
+        return ResponseEntity.ok(sharingService.createWebhook(createWebhookDTO));
     }
 
     @SecurityRequirement(name = "Bearer Authentication")
@@ -39,6 +38,7 @@ public class SharingController {
     public ResponseEntity createAction (CreateActionDTO action){
         return ResponseEntity.ok(actionService.createAction(action));
     }
+
     @SecurityRequirement(name = "Bearer Authentication")
     @GetMapping
     public List<Action> listActions(){
@@ -47,8 +47,7 @@ public class SharingController {
 
     @PostMapping("decript-sharing/{shareToken}")
     public ResponseEntity decriptSharing(@RequestBody ValueDTO share, @PathVariable("shareToken") String shareToken) throws Exception {
-        return ResponseEntity.ok(sharingService.decriptSharing(share,shareToken));
+        return ResponseEntity.ok(sharingService.decriptSharing(share, shareToken));
     }
-
 
 }
