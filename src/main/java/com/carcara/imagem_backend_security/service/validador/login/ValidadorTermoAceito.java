@@ -52,10 +52,7 @@ public class ValidadorTermoAceito implements ValidadorLogin{
 
         if (itensAceitos.isEmpty()) {
             user.setRole(UserRole.ACEITETERMO);
-
-
             userRepository.save(user);
-            throw new AceiteTermoException("Aguardando aceite do termo", HttpStatus.FORBIDDEN, versaoAtual);
         }
     }
 }

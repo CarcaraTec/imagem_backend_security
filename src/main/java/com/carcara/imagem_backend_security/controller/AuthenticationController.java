@@ -2,10 +2,7 @@ package com.carcara.imagem_backend_security.controller;
 
 import com.carcara.imagem_backend_security.enums.StatusRegister;
 import com.carcara.imagem_backend_security.enums.UserRole;
-import com.carcara.imagem_backend_security.exception.AceiteTermoException;
-import com.carcara.imagem_backend_security.exception.ApiException;
-import com.carcara.imagem_backend_security.exception.ErrorResponseTermoNaoAceito;
-import com.carcara.imagem_backend_security.exception.ValidacaoException;
+import com.carcara.imagem_backend_security.exception.*;
 import com.carcara.imagem_backend_security.infra.config.TokenService;
 import com.carcara.imagem_backend_security.model.*;
 import com.carcara.imagem_backend_security.repository.UserRepository;
@@ -38,10 +35,13 @@ public class AuthenticationController {
 
     @Autowired
     private AuthenticationManager authenticationManager;
+
     @Autowired
     private UserRepository userRepository;
+
     @Autowired
     private TokenService tokenService;
+
     @Autowired
     private UserService userService;
 
@@ -51,19 +51,26 @@ public class AuthenticationController {
     @Autowired
     private ChavesAcessoRepository chavesAcessoRepository;
 
-
     @PostMapping("/login")
     @Operation(summary = "Logar")
     public ResponseEntity login(@RequestBody @Valid AuthenticationDTO data) throws Exception {
         String username = userService.encontrarUsuario(data.login());
-        var usernamePassword = new UsernamePasswordAuthenticationToken(username, data.password());
+        if(username == null){
+            throw new SolicitacaoNaoAutorizada("Email ou senha incorreto!");
+        }
+        var usernamePassword = log(username, data.password());
         var auth = this.authenticationManager.authenticate(usernamePassword);
         var user = (User) auth.getPrincipal();
-
-
         return userService.logar(user);
     }
 
+    public static UsernamePasswordAuthenticationToken log(String username, String password){
+        try{
+            return new UsernamePasswordAuthenticationToken(username, password);
+        }catch (Exception e){
+            throw new SolicitacaoNaoAutorizada("Email ou senha incorreto!");
+        }
+    }
 
     @PostMapping("/register")
     @Operation(summary = "Registrar")
