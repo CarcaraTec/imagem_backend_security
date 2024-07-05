@@ -31,13 +31,26 @@ public class UsuarioAdmUtil {
         return users;
     }
 
+    public void excluirUsuario(String username){
+        List<UserLogin> todosUsuarios = getUsers();
+        for(UserLogin userLogin : todosUsuarios){
+            if(userLogin.username().equals(username)){
+                todosUsuarios.remove(userLogin);
+                break;
+            }
+        }
+        this.users = todosUsuarios;;
+    }
+
     @PostConstruct
     public void init() throws Exception {
-        this.users = getUsuarios().stream().map(user -> new UserLogin(user)).toList();
+        this.users = new ArrayList<>(getUsuarios().stream().map(user -> new UserLogin(user)).toList());
     }
 
     public void carregarUsuario(Integer userId, String username, String password) throws Exception {
-        this.users = List.of(new UserLogin(userId, username, password));
+        List<UserLogin> todosUsuarios = getUsers();
+        todosUsuarios.add(new UserLogin(userId, username, password));
+        this.users = todosUsuarios;
     }
 
     public List<User> getUsuarios() throws Exception {
@@ -45,8 +58,10 @@ public class UsuarioAdmUtil {
 
         for (User user : usuario) {
             String chave = chavesAcessoRepository.getEncrypted(user.getUserId());
-            SecretKey secretKey = EncryptionUtil.convertStringToSecretKey(chave);
-            DTOEncryptor.decryptDTO(user,secretKey);
+            if(chave != null){
+                SecretKey secretKey = EncryptionUtil.convertStringToSecretKey(chave);
+                DTOEncryptor.decryptDTO(user,secretKey);
+            }
         }
 
         return usuario;

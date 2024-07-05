@@ -45,9 +45,12 @@ public class SecurityConfigurations {
                     authorize
                             .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
                             .requestMatchers(HttpMethod.POST, "/auth/register").permitAll()
+                            .requestMatchers(HttpMethod.POST, "/sharing/decript-sharing/*").permitAll()
                             .requestMatchers(HttpMethod.GET, "/termo/ultimo-termo").permitAll()
                             .requestMatchers(HttpMethod.POST, "/itensTermo/aceitar").permitAll()
                             .requestMatchers(HttpMethod.POST, "/itensTermo/atualizar-itens").hasAnyRole("ADMIN", "USER")
+                            .requestMatchers(HttpMethod.POST, "/sharing/create-action").hasAnyRole("ADMIN", "USER")
+                            .requestMatchers(HttpMethod.POST, "/sharing/create-webhook").hasAnyRole("ADMIN", "USER")
                             .requestMatchers(HttpMethod.POST, "/termo/acidionaTermo").hasRole("ADMIN")
                             .requestMatchers(HttpMethod.GET, "/user/dadosPessoaisUsuarios").hasAnyRole("USER", "ADMIN")
                             .requestMatchers(HttpMethod.GET, "/user/usuariosStatusAguardando").hasRole("ADMIN")
@@ -55,8 +58,9 @@ public class SecurityConfigurations {
                             .requestMatchers(HttpMethod.PUT, "/user/updateStatusRecusado").hasRole("ADMIN")
                             .requestMatchers(HttpMethod.PUT, "/user/updateUsuario").hasAnyRole("USER", "ADMIN")
                             .requestMatchers(HttpMethod.GET, "/user/buscar").hasAnyRole("ADMIN", "USER")
-                            .requestMatchers(HttpMethod.DELETE, "/user/delete-account").hasAnyRole("ADMIN", "USER")
+                            .requestMatchers(HttpMethod.DELETE, "/user/delete-account").permitAll()
                             .requestMatchers(HttpMethod.GET, "/user/listar").hasAnyRole("ADMIN", "USER")
+                            .requestMatchers(HttpMethod.GET, "/sharing").hasAnyRole("ADMIN", "USER")
                             .requestMatchers(HttpMethod.GET, "/itens-aceitos").hasAnyRole("ADMIN", "USER")
                             .requestMatchers(HttpMethod.GET, "/itens-aceitos/logs").hasAnyRole("ADMIN", "USER","ACEITETERMO")
                             .anyRequest().authenticated();
@@ -65,8 +69,6 @@ public class SecurityConfigurations {
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
-
-   
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {

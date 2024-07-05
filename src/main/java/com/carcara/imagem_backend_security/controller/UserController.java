@@ -3,8 +3,10 @@ package com.carcara.imagem_backend_security.controller;
 import com.carcara.imagem_backend_security.enums.StatusRegister;
 import com.carcara.imagem_backend_security.exception.ApiException;
 import com.carcara.imagem_backend_security.model.DadosAtualizacaoUsuario;
+import com.carcara.imagem_backend_security.model.User;
 import com.carcara.imagem_backend_security.model.lgpd.Termo;
 import com.carcara.imagem_backend_security.repository.projection.DadosUsuarioProjection;
+import com.carcara.imagem_backend_security.service.SharingService;
 import com.carcara.imagem_backend_security.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -25,6 +27,8 @@ public class UserController {
 
     @Autowired
     UserService service;
+
+
 
     @SecurityRequirement(name = "Bearer Authentication")
     @GetMapping("/dadosPessoaisUsuarios")
@@ -67,8 +71,8 @@ public class UserController {
     @GetMapping("/listar")
     @SecurityRequirement(name = "Bearer Authentication")
     @Operation(summary = "Lista todos usuarios")
-    public ResponseEntity listarUsuarios(@RequestParam(required = false) StatusRegister status){
-        List<DadosUsuarioProjection> users = service.listarUsuarios(status);
+    public ResponseEntity listarUsuarios(@RequestParam(required = false) StatusRegister status) throws Exception {
+        List<User> users = service.listarUsuarios(status);
         return ResponseEntity.ok().body(users);
     }
 
