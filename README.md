@@ -1,1 +1,1 @@
-# imagem_backend_security
+# Microserviço de autenticação para o sistema de análise de sentimentos.
